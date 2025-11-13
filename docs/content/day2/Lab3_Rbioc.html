@@ -1103,7 +1103,7 @@ colData names(9): SampleName cell ... Sample BioSample</code></pre>
 </div>
 </section><section id="genomicranges-class-a.k.a.-granges" class="level4" data-number="6.2.2.2"><h4 data-number="6.2.2.2" class="anchored" data-anchor-id="genomicranges-class-a.k.a.-granges">
 <span class="header-section-number">6.2.2.2</span> <code>GenomicRanges</code> class (a.k.a. <code>GRanges</code>):</h4>
-<p><code>GenomicRanges</code> are a type of <code>IntervalRanges</code>, they are useful to describe genomic intervals. Each entry in a <code>GRanges</code> object has a <code><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqinfo.html">seqnames()</a></code>, a <code><a href="https://rdrr.io/r/stats/start.html">start()</a></code> and an <code><a href="https://rdrr.io/r/stats/start.html">end()</a></code> coordinates, a <code><a href="https://rdrr.io/pkg/BiocGenerics/man/strand.html">strand()</a></code>, as well as associated metadata (<code><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html">mcols()</a></code>). They can be built from scratch using <code>tibbles</code> converted with <code><a href="https://rdrr.io/pkg/GenomicRanges/man/makeGRangesFromDataFrame.html">makeGRangesFromDataFrame()</a></code>.</p>
+<p><code>GenomicRanges</code> are a type of <code>IntervalRanges</code>, they are useful to describe genomic intervals. Each entry in a <code>GRanges</code> object has a <code><a href="https://rdrr.io/pkg/Seqinfo/man/seqinfo.html">seqnames()</a></code>, a <code><a href="https://rdrr.io/r/stats/start.html">start()</a></code> and an <code><a href="https://rdrr.io/r/stats/start.html">end()</a></code> coordinates, a <code><a href="https://rdrr.io/pkg/BiocGenerics/man/strand.html">strand()</a></code>, as well as associated metadata (<code><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html">mcols()</a></code>). They can be built from scratch using <code>tibbles</code> converted with <code><a href="https://rdrr.io/pkg/GenomicRanges/man/makeGRangesFromDataFrame.html">makeGRangesFromDataFrame()</a></code>.</p>
 <div class="cell">
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -1194,7 +1194,7 @@ Attaching package: 'plyranges'</code></pre>
 </div>
 <div class="sourceCode" id="cb88"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gr</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">start</span> <span class="op">&lt;</span> <span class="fl">400</span>, <span class="va">end</span> <span class="op">&gt;</span> <span class="fl">12000</span>, <span class="va">end</span> <span class="op">&lt;</span> <span class="fl">15000</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqinfo.html">seqnames</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/Seqinfo/man/seqinfo.html">seqnames</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/table.html">table</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -1367,7 +1367,7 @@ dbl (3): X2, X3, X5
 <pre><code>loading from cache</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code><a href="https://github.com/jorainer/ensembldb">require("ensembldb")</a></code></pre>
+<pre><code><a href="https://rdrr.io/r/base/library.html">require("ensembldb")</a></code></pre>
 </div>
 <div class="sourceCode" id="cb103"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sce</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1756,7 +1756,7 @@ Answer
 <div class="code-with-filename-file">
 <pre><strong>R</strong></pre>
 </div>
-<div class="sourceCode" id="cb155"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sce_seurat</span> <span class="op">&lt;-</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/as.Seurat.html">as.Seurat</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb155"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sce_seurat</span> <span class="op">&lt;-</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/as.Seurat.html">as.Seurat</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Keys should be one or more alphanumeric characters followed by an underscore, setting key from DC to DC_</code></pre>
@@ -2075,7 +2075,7 @@ Answer
 <pre><code>[1] 500</code></pre>
 </div>
 <div class="sourceCode" id="cb176"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># cells and features access</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/Cells.html">Cells</a></span><span class="op">(</span><span class="va">sce_seurat</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html">Cells</a></span><span class="op">(</span><span class="va">sce_seurat</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "HSPC_007" "HSPC_013" "HSPC_019" "HSPC_025" "HSPC_031" "HSPC_037"</code></pre>
 </div>
@@ -2107,7 +2107,7 @@ HSPC_037                2267894                               0  HSPC   0.514315
   "HSPC"   "HSPC"   "HSPC"   "HSPC"   "HSPC"   "HSPC" </code></pre>
 </div>
 <div class="sourceCode" id="cb184"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Counts access</span></span>
-<span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/AssayData.html">GetAssayData</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sce_seurat</span>, layer <span class="op">=</span> <span class="st">"counts"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/AssayData.html">GetAssayData</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sce_seurat</span>, layer <span class="op">=</span> <span class="st">"counts"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>10 x 10 sparse Matrix of class "dgCMatrix"</code></pre>
 </div>
@@ -2127,7 +2127,7 @@ ENSMUSG00000003949  4  15  3  175 915 1131   41 1465 330 258
 ENSMUSG00000052684  1   4  2  144  82    5  142  578   .  78
 ENSMUSG00000026358  .  27  6  344   3    9    3 3612 185   .</code></pre>
 </div>
-<div class="sourceCode" id="cb188"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/AssayData.html">GetAssayData</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sce_seurat</span>, layer <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb188"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/AssayData.html">GetAssayData</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sce_seurat</span>, layer <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>10 x 10 sparse Matrix of class "dgCMatrix"</code></pre>
 </div>
@@ -2148,7 +2148,7 @@ ENSMUSG00000052684  5.2365  5.4994 6.6639  8.1136 6.23123  3.4225  9.8009  8.047
 ENSMUSG00000026358  .       8.2269 8.2393  9.3669 1.89216  4.2094  4.3091 10.68693 8.4872  .     </code></pre>
 </div>
 <div class="sourceCode" id="cb192"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Embeddings </span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/Embeddings.html">Embeddings</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sce_seurat</span>, reduction <span class="op">=</span> <span class="st">"diffusion"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Embeddings.html">Embeddings</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sce_seurat</span>, reduction <span class="op">=</span> <span class="st">"diffusion"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              DC_1       DC_2     DC_3
 HSPC_007        NA         NA       NA
@@ -2195,7 +2195,7 @@ Answer
 <pre><strong>R</strong></pre>
 </div>
 <div class="sourceCode" id="cb194"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span></span>
-<span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">DropletUtils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DropletUtils/man/read10xCounts.html">read10xCounts</a></span><span class="op">(</span><span class="st">'~/Share/data_wrangling/counts/outs/filtered_feature_bc_matrix.h5'</span><span class="op">)</span></span>
+<span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">DropletUtils</span><span class="fu">::</span><span class="fu">read10xCounts</span><span class="op">(</span><span class="st">'~/Share/data_wrangling/counts/outs/filtered_feature_bc_matrix.h5'</span><span class="op">)</span></span>
 <span><span class="va">sce</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -2280,7 +2280,7 @@ Answer
 <div class="code-with-filename-file">
 <pre><strong>R</strong></pre>
 </div>
-<div class="sourceCode" id="cb200"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">organs</span> <span class="op">&lt;-</span> <span class="fu">scRNAseq</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scRNAseq/man/HeOrganAtlasData.html">HeOrganAtlasData</a></span><span class="op">(</span>ensembl <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb200"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">organs</span> <span class="op">&lt;-</span> <span class="fu">scRNAseq</span><span class="fu">::</span><span class="fu">HeOrganAtlasData</span><span class="op">(</span>ensembl <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>loading from cache</code></pre>

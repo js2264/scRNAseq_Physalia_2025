@@ -1,28 +1,26 @@
-# Prerequisites {-}
+# Prerequisites {.unnumbered}
 
-The course is intended for those who have basic familiarity with Unix and 
-the R scripting language.
+The course is intended for those who have basic familiarity with Unix and the R scripting language.
 
-We will also assume that you are familiar with mapping and analyzing bulk 
-RNA-seq data as well as with the commonly available computational tools.
+We will also assume that you are familiar with mapping and analyzing bulk RNA-seq data as well as with the commonly available computational tools.
 
-* If a refresher is needed for Unix command line (hopefully not), please go over [this tutorial](https://ryanstutorials.net/linuxtutorial/) and its [companion cheatsheet](https://ryanstutorials.net/linuxtutorial/cheatsheet.php).
-* Getting down to basics: an introduction to the fundamentals of R ([courtesy of Mark Ravinet](markravinet.github.io/Introduction.html)).
-* Gentle introduction to `R/Biocondutor`: [here](https://bioconductor.github.io/BiocWorkshops/introduction-to-bioconductor-annotation-resources.html)
-* For a full in-depth guide of `Bioconductor` ecosystem: read the comprehensive `R/Bioconductor` book from Kasper D. Hansen available under the CC BY-NC-SA 4.0 license [[PDF]](/{{<myPackageUrl>}}docs/bioconductor.pdf)
+-   If a refresher is needed for Unix command line (hopefully not), please go over [this tutorial](https://ryanstutorials.net/linuxtutorial/) and its [companion cheatsheet](https://ryanstutorials.net/linuxtutorial/cheatsheet.php).
+-   Getting down to basics: an introduction to the fundamentals of R ([courtesy of Mark Ravinet](markravinet.github.io/Introduction.html)).
+-   Gentle introduction to `R/Biocondutor`: [here](https://bioconductor.github.io/BiocWorkshops/introduction-to-bioconductor-annotation-resources.html)
+-   For a full in-depth guide of `Bioconductor` ecosystem: read the comprehensive `R/Bioconductor` book from Kasper D. Hansen available under the CC BY-NC-SA 4.0 license [\[PDF\]](/%7B%7B%3CmyPackageUrl%3E%7D%7Ddocs/bioconductor.pdf)
 
-## Local configuration 
+## Local configuration
 
-* Ideally (though not strictly required), a configured SSH client (it should be already installed on Linux/Mac machines, `PuTTY` can be set up for Windows). 
-* Ideally (though not strictly required), a SSH ftp client (`Forklift` is excellent for Mac, although not free beyond the trial version; `cyberduck` can be used for Windows; `FileZilla` can be used for both Mac, Windows and Linux).
-* Computer with high-speed internet access (no specific configuration required - everything will be performed on a remote AWS machine). 
-* Zoom visioconference software
+-   Ideally (though not strictly required), a configured SSH client (it should be already installed on Linux/Mac machines, `PuTTY` can be set up for Windows).
+-   Ideally (though not strictly required), a SSH ftp client (`Forklift` is excellent for Mac, although not free beyond the trial version; `cyberduck` can be used for Windows; `FileZilla` can be used for both Mac, Windows and Linux).
+-   Computer with high-speed internet access (no specific configuration required - everything will be performed on a remote AWS machine).
+-   Zoom visioconference software
 
-## Remote configuration 
+## Remote configuration
 
 The AWS machine is running with `Ubuntu` and has been set up as follows:
 
-```sh
+``` sh
 ## --- Clean up previous R installs and system libraries
 sudo apt purge r-base* r-recommended r-cran-*
 sudo apt autoremove
@@ -64,9 +62,9 @@ sudo apt update
 sudo apt install r-base r-recommended r-base-core
 ```
 
-The following packages have been installed (along with their many dependencies, of course!): 
+The following packages have been installed (along with their many dependencies, of course!):
 
-```sh
+``` sh
 ## --- Install important R packages for single-cell RNA-seq projects
 ## pak 
 sudo Rscript -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
@@ -125,4 +123,3 @@ sudo dpkg -i bcl2fastq2_0v2.17.1.14-2_amd64.deb
 ## Add basilisk external dir to system-wide Renviron
 sudo echo "BASILISK_EXTERNAL_DIR=/opt/basilisk_envs" >> /etc/R/Renviron
 ```
-
