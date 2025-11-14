@@ -112,7 +112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-title mb-0 py-0">
       <a href="../../">Single-cell RNAseq analysis with R/Bioconductor</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/js2264/scRNAseq_Physalia_2024/" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/js2264/scRNAseq_Physalia_2025/" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
@@ -314,7 +314,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
 <li><a href="#demultiplexing-sequencing-data-with-cellranger-mkfastq" id="toc-demultiplexing-sequencing-data-with-cellranger-mkfastq" class="nav-link active" data-scroll-target="#demultiplexing-sequencing-data-with-cellranger-mkfastq"><span class="header-section-number">4.1</span> Demultiplexing sequencing data with <code>cellranger mkfastq</code></a></li>
   <li><a href="#generating-gene-count-matrices-with-cellranger-count" id="toc-generating-gene-count-matrices-with-cellranger-count" class="nav-link" data-scroll-target="#generating-gene-count-matrices-with-cellranger-count"><span class="header-section-number">4.2</span> Generating gene count matrices with <code>cellranger count</code></a></li>
-  </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/js2264/scRNAseq_Physalia_2024/edit/main/content/day1/Lab2_processingreads.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/js2264/scRNAseq_Physalia_2024/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+  </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/js2264/scRNAseq_Physalia_2025/edit/main/content/day1/Lab2_processingreads.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/js2264/scRNAseq_Physalia_2025/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
@@ -440,12 +440,12 @@ Answer
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>total 32
-drwxr-xr-x  6 jacques  staff   192 Oct 29 10:54 Config
-drwxr-xr-x  3 jacques  staff    96 Oct 29 10:54 Data
-drwxr-xr-x  9 jacques  staff   288 Oct 29 10:54 InterOp
--rw-r--r--  1 jacques  staff    48 Jun  7  2023 RTAComplete.txt
--rw-r--r--  1 jacques  staff   673 Jun  7  2023 RunInfo.xml
--rw-r--r--  1 jacques  staff  5366 Jun  7  2023 runParameters.xml</code></pre>
+drwxr-xr-x  6 jacques  staff   192 Nov  3 13:22 Config
+drwxr-xr-x  3 jacques  staff    96 Nov  3 13:22 Data
+drwxr-xr-x  9 jacques  staff   288 Nov  3 13:22 InterOp
+-rw-r--r--  1 jacques  staff    48 Nov  3 13:22 RTAComplete.txt
+-rw-r--r--  1 jacques  staff   673 Nov  3 13:22 RunInfo.xml
+-rw-r--r--  1 jacques  staff  5366 Nov  3 13:22 runParameters.xml</code></pre>
 </div>
 </div>
 </div>
@@ -615,35 +615,45 @@ Answer
 </div>
 </div>
 <div class="cell">
-<pre class="code cell-code"><code>/opt/cellranger/bin
-cellranger mkfastq (cellranger-5.0.1)
-Copyright (c) 2020 10x Genomics, Inc.  All rights reserved.
+<pre class="code cell-code"><code>/opt/gensoft/exe/cellranger/7.1.0/libexec/bin
+cellranger mkfastq (cellranger-7.1.0)
+Copyright (c) 2021 10x Genomics, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
-Martian Runtime - v4.0.2
-Serving UI at http://alcide:36825?auth=0r06HTBMZxdlUuIo9SDR6HlYjSyn7ohyqq9S6lsPlYA
+Martian Runtime - v4.0.10
+2025-11-13 18:54:39 [runtime] Reattaching in local mode.
+Serving UI at http://maestro-submit:33167?auth=UT6bG4dNCAFoyY5KH9jUeLvbk0g-HjGeeSnZgLYGHok
 
-Running preflight checks (please wait)...
+2025-11-13 18:54:39 [runtime] (reset-partial)   ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MAKE_FASTQS_PREFLIGHT_LOCAL.fork0.chnk0
+2025-11-13 18:54:39 [runtime] Found orphaned local stage: ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MAKE_FASTQS_PREFLIGHT_LOCAL
 Checking run folder...
 Checking RunInfo.xml...
 Checking system environment...
 Emitting run information...
 Checking read specification...
 Checking samplesheet specs...
-2024-10-29 11:42:56 [runtime] (ready)           ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.PREPARE_SAMPLESHEET
-2024-10-29 11:42:56 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.PREPARE_SAMPLESHEET.fork0.chnk0.main
-...
-2024-10-29 11:43:00 [runtime] (split_complete)  ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE
-2024-10-29 11:43:00 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE.fork0.chnk0.main
-2024-10-29 11:43:00 [runtime] (chunks_complete) ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE
-2024-10-29 11:43:00 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE.fork0.join
-2024-10-29 11:43:00 [runtime] (join_complete)   ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE
+2025-11-13 18:54:42 [runtime] (ready)           ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.PREPARE_SAMPLESHEET
+2025-11-13 18:54:42 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.PREPARE_SAMPLESHEET.fork0.chnk0.main
+2025-11-13 18:54:44 [runtime] (chunks_complete) ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.PREPARE_SAMPLESHEET
+2025-11-13 18:54:44 [runtime] (ready)           ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.BCL2FASTQ_WITH_SAMPLESHEET
+2025-11-13 18:54:44 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.BCL2FASTQ_WITH_SAMPLESHEET.fork0.split
+2025-11-13 18:54:45 [runtime] (split_complete)  ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.BCL2FASTQ_WITH_SAMPLESHEET
+2025-11-13 18:54:45 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.BCL2FASTQ_WITH_SAMPLESHEET.fork0.chnk0.main
+2025-11-13 18:54:49 [runtime] (chunks_complete) ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.BCL2FASTQ_WITH_SAMPLESHEET
+2025-11-13 18:54:49 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.BCL2FASTQ_WITH_SAMPLESHEET.fork0.join
+2025-11-13 18:54:50 [runtime] (join_complete)   ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.BCL2FASTQ_WITH_SAMPLESHEET
+2025-11-13 18:54:50 [runtime] (ready)           ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE
+2025-11-13 18:54:50 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE.fork0.split
+2025-11-13 18:54:52 [runtime] (split_complete)  ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE
+2025-11-13 18:54:52 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE.fork0.chnk0.main
+2025-11-13 18:54:54 [runtime] (chunks_complete) ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE
+2025-11-13 18:54:54 [runtime] (run:local)       ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE.fork0.join
+2025-11-13 18:54:56 [runtime] (join_complete)   ID.tiny-bcl.MAKE_FASTQS_CS.MAKE_FASTQS.MERGE_FASTQS_BY_LANE_SAMPLE
 
 Outputs:
-- Run QC metrics:        null
-- FASTQ output folder:   /home/rsg/tiny-bcl/outs/fastq_path
-- Interop output folder: /home/rsg/tiny-bcl/outs/interop_path
-- Input samplesheet:     /home/rsg/tiny-bcl/outs/input_samplesheet.csv
+- FASTQ output folder:   /pasteur/appa/homes/jaseriza/tiny-bcl/outs/fastq_path
+- Interop output folder: /pasteur/appa/homes/jaseriza/tiny-bcl/outs/interop_path
+- Input samplesheet:     /pasteur/appa/homes/jaseriza/tiny-bcl/outs/input_samplesheet.csv
 
 Waiting 6 seconds for UI to do final refresh.
 Pipestance completed successfully!
@@ -662,13 +672,13 @@ Saving pipestance info to "tiny-bcl/tiny-bcl.mri.tgz"</code></pre>
 <div class="code-with-filename-file">
 <pre><strong>bash</strong></pre>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> ~/tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> ~/Share/data_wrangling/tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>total 96296
--rw-r--r--  1 jacques  staff   3930346 Oct 30 23:46 test_sample_S1_L001_I1_001.fastq.gz
--rw-r--r--  1 jacques  staff  11093755 Oct 30 23:46 test_sample_S1_L001_R1_001.fastq.gz
--rw-r--r--  1 jacques  staff  34273874 Oct 30 23:46 test_sample_S1_L001_R2_001.fastq.gz</code></pre>
+-rw-r--r--  1 jacques  staff   3930346 Nov  3 13:22 test_sample_S1_L001_I1_001.fastq.gz
+-rw-r--r--  1 jacques  staff  11093755 Nov  3 13:22 test_sample_S1_L001_R1_001.fastq.gz
+-rw-r--r--  1 jacques  staff  34273874 Nov  3 13:22 test_sample_S1_L001_R2_001.fastq.gz</code></pre>
 </div>
 </div>
 <div class="icon callout callout-style-default callout-question no-icon callout-titled">
@@ -700,7 +710,7 @@ Answer
 <div class="code-with-filename-file">
 <pre><strong>bash</strong></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample/test_sample_S1_L001_I1_001.fastq.gz <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 12</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> ~/Share/data_wrangling/tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample/test_sample_S1_L001_I1_001.fastq.gz <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 12</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div class="cell">
@@ -788,6 +798,102 @@ OPTIONS:
         --uiport &lt;PORT&gt;           Serve web UI at http://localhost:PORT</code></pre>
 </div>
 <p>Now, we will generate a gene count matrix for the <code>test_sample</code> reads using <code>cellranger count</code> and the transcriptome reference provided in <code>~/Share/refdata-gex-mm10-2020-A/</code></p>
+<p>::: {.callout-question .icon .callout-note}</p>
+<p>What is the purpose of the <code>--id</code>, <code>--transcriptome</code>, <code>--fastqs</code>, <code>--sample</code>, and <code>--create-bam</code> arguments?</p>
+<p>::: {.callout-answer .icon .callout-note collapse=true}</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>bash</strong></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cellranger</span> count <span class="at">--id</span> counts <span class="at">--transcriptome</span> ~/Share/refdata-gex-mm10-2020-A/ <span class="at">--fastqs</span> tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample <span class="at">--sample</span> test_sample</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="cell">
+<pre class="code cell-code"><code>Martian Runtime - v4.0.10
+2025-11-13 19:17:49 [runtime] Reattaching in local mode.
+Serving UI at http://maestro-submit:44641?auth=o3OFtia-5rPZ9nn37zNcvPNwtZ0XLSszXeGPSzNA2Ds
+
+2025-11-13 19:17:49 [runtime] (reset-partial)   ID.counts.SC_RNA_COUNTER_CS.CELLRANGER_PREFLIGHT.fork0.chnk0
+2025-11-13 19:17:49 [runtime] (reset-partial)   ID.counts.SC_RNA_COUNTER_CS.CELLRANGER_PREFLIGHT_LOCAL.fork0.chnk0
+2025-11-13 19:17:49 [runtime] Found orphaned local stage: ID.counts.SC_RNA_COUNTER_CS.CELLRANGER_PREFLIGHT_LOCAL
+2025-11-13 19:17:49 [runtime] Found orphaned local stage: ID.counts.SC_RNA_COUNTER_CS.CELLRANGER_PREFLIGHT
+Checking sample info...
+Checking FASTQ folder...
+Checking reference...
+Checking reference_path (/pasteur/appa/scratch/jaseriza/Share/refdata-gex-mm10-2020-A) on maestro-submit...
+Checking optional arguments...
+mro: v4.0.10
+mrp: v4.0.10
+Anaconda: Python 3.9.7
+numpy: 1.22.3
+scipy: 1.9.1
+pysam: 0.17.0
+h5py: 3.6.0
+pandas: 1.3.5
+STAR: 2.7.2a
+samtools: samtools 1.12
+2025-11-13 19:17:53 [runtime] (ready)           ID.counts.SC_RNA_COUNTER_CS.WRITE_GENE_INDEX
+2025-11-13 19:17:53 [runtime] (run:local)       ID.counts.SC_RNA_COUNTER_CS.WRITE_GENE_INDEX.fork0.chnk0.main
+2025-11-13 19:17:53 [runtime] (ready)           ID.counts.SC_RNA_COUNTER_CS.SC_MULTI_CORE.MAKE_FULL_CONFIG._MAKE_VDJ_CONFIG
+
+...
+
+Outputs:
+- Run summary HTML:                         /home/rsg/counts/outs/web_summary.html
+- Run summary CSV:                          /home/rsg/counts/outs/metrics_summary.csv
+- BAM:                                      /home/rsg/counts/outs/possorted_genome_bam.bam
+- BAM BAI index:                            /home/rsg/counts/outs/possorted_genome_bam.bam.bai
+- BAM CSI index:                            null
+- Filtered feature-barcode matrices MEX:    /home/rsg/counts/outs/filtered_feature_bc_matrix
+- Filtered feature-barcode matrices HDF5:   /home/rsg/counts/outs/filtered_feature_bc_matrix.h5
+- Unfiltered feature-barcode matrices MEX:  /home/rsg/counts/outs/raw_feature_bc_matrix
+- Unfiltered feature-barcode matrices HDF5: /home/rsg/counts/outs/raw_feature_bc_matrix.h5
+- Secondary analysis output CSV:            /home/rsg/counts/outs/analysis
+- Per-molecule read information:            /home/rsg/counts/outs/molecule_info.h5
+- CRISPR-specific analysis:                 null
+- Antibody aggregate barcodes:              null
+- Loupe Browser file:                       /home/rsg/counts/outs/cloupe.cloupe
+- Feature Reference:                        null
+- Target Panel File:                        null
+- Probe Set File:                           null
+
+Waiting 6 seconds for UI to do final refresh.
+Pipestance completed successfully!
+
+2025-11-13 19:19:53 Shutting down.```
+
+:::
+
+:::
+
+While the count command is running, read about the [format of the feature-barcode matrices](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/output/matrices).
+
+Once the count command is finished running, the pipeline outputs can be viewed with `ls`:
+</code></pre>
+</div>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>bash</strong></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> ~/Share/data_wrangling/counts/outs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>total 113776
+drwxr-xr-x  7 jacques  staff       224 Nov  3 13:22 analysis
+-rw-r--r--  1 jacques  staff   2782024 Nov  3 13:22 cloupe.cloupe
+drwxr-xr-x  5 jacques  staff       160 Nov  3 13:22 filtered_feature_bc_matrix
+-rw-r--r--  1 jacques  staff    506767 Nov  3 13:22 filtered_feature_bc_matrix.h5
+-rw-r--r--  1 jacques  staff       627 Nov  3 13:22 metrics_summary.csv
+-rw-r--r--  1 jacques  staff   1806311 Nov  3 13:22 molecule_info.h5
+-rw-r--r--  1 jacques  staff  47960294 Nov  3 13:22 possorted_genome_bam.bam
+-rw-r--r--  1 jacques  staff   1744976 Nov  3 13:22 possorted_genome_bam.bam.bai
+drwxr-xr-x  5 jacques  staff       160 Nov  3 13:22 raw_feature_bc_matrix
+-rw-r--r--  1 jacques  staff    921409 Nov  3 13:22 raw_feature_bc_matrix.h5
+-rw-r--r--  1 jacques  staff   2513806 Nov  3 13:22 web_summary.html</code></pre>
+</div>
+</div>
 <div class="icon callout callout-style-default callout-question no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -798,9 +904,31 @@ Question
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>What is the purpose of the <code>--id</code>, <code>--transcriptome</code>, <code>--fastqs</code>, <code>--sample</code>, and <code>--create-bam</code> arguments?</p>
+<p>Can you locate the feature-barcode matrices? What is the difference between the <code>raw_feature_bc_matrix</code> and <code>filtered_feature_bc_matrix</code> data types?</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>bash</strong></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> ~/Share/data_wrangling/counts/outs/raw_feature_bc_matrix.h5</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> ~/Share/data_wrangling/counts/outs/filtered_feature_bc_matrix.h5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>How many cells and genes are stored in each matrix? Comment.</p>
 <div class="icon callout callout-style-default callout-answer no-icon callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -809,115 +937,28 @@ Answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>bash</strong></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cellranger</span> count <span class="at">--id</span> counts <span class="at">--transcriptome</span> ~/Share/refdata-gex-mm10-2020-A/ <span class="at">--fastqs</span> tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample <span class="at">--sample</span> test_sample <span class="at">--create-bam</span> true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div class="cell">
-<pre class="code cell-code"><code>Martian Runtime - v4.0.2
-Serving UI at http://alcide:35163?auth=IERAjMung3pm8corwsthsKjEue66fJwPDK0-5l-CLCo
-
-Running preflight checks (please wait)...
-
-Checking sample info...
-Checking FASTQ folder...
-Checking reference...
-Checking reference_path (~/Share/refdata-gex-mm10-2020-A) on alcide...
-Checking chemistry...
-Checking optional arguments...
-
-mrc: v4.0.2
-
-mrp: v4.0.2
-
-Anaconda: 
-numpy: 1.15.4
-
-scipy: 1.1.0
-
-pysam: 0.16.0.1
-
-h5py: 2.8.0
-
-pandas: 0.24.2
-
-STAR: 2.7.2a
-
-samtools: samtools 1.10
-Using htslib 1.10.2
-Copyright (C) 2019 Genome Research Ltd.
-
-2024-10-29 17:18:47 [runtime] (ready)           ID.counts.SC_RNA_COUNTER_CS.SC_MULTI_CORE.MAKE_FULL_CONFIG._MAKE_VDJ_CONFIG
-2024-10-29 17:18:47 [runtime] (run:local)       ID.counts.SC_RNA_COUNTER_CS.SC_MULTI_CORE.MAKE_FULL_CONFIG._MAKE_VDJ_CONFIG.fork0.chnk0.main
-2024-10-29 17:18:47 [runtime] (ready)           ID.counts.SC_RNA_COUNTER_CS.FULL_COUNT_INPUTS.WRITE_GENE_INDEX
-
-...
-...
-...
-
-2024-10-29 17:25:30 [runtime] (run:local)       ID.counts.SC_RNA_COUNTER_CS.SC_MULTI_CORE.MULTI_REPORTER.CLOUPE_PREPROCESS.fork0.chnk0.main
-2024-10-29 17:25:32 [runtime] (chunks_complete) ID.counts.SC_RNA_COUNTER_CS.SC_MULTI_CORE.MULTI_REPORTER.CLOUPE_PREPROCESS
-2024-10-29 17:25:32 [runtime] (run:local)       ID.counts.SC_RNA_COUNTER_CS.SC_MULTI_CORE.MULTI_REPORTER.CLOUPE_PREPROCESS.fork0.join
-2024-10-29 17:25:33 [runtime] (join_complete)   ID.counts.SC_RNA_COUNTER_CS.SC_MULTI_CORE.MULTI_REPORTER.CLOUPE_PREPROCESS
-
-Outputs:
-- Run summary HTML:                         /home/rsg/counts/outs/web_summary.html
-- Run summary CSV:                          /home/rsg/counts/outs/metrics_summary.csv
-- BAM:                                      /home/rsg/counts/outs/possorted_genome_bam.bam
-- BAM index:                                /home/rsg/counts/outs/possorted_genome_bam.bam.bai
-- Filtered feature-barcode matrices MEX:    /home/rsg/counts/outs/filtered_feature_bc_matrix
-- Filtered feature-barcode matrices HDF5:   /home/rsg/counts/outs/filtered_feature_bc_matrix.h5
-- Unfiltered feature-barcode matrices MEX:  /home/rsg/counts/outs/raw_feature_bc_matrix
-- Unfiltered feature-barcode matrices HDF5: /home/rsg/counts/outs/raw_feature_bc_matrix.h5
-- Secondary analysis output CSV:            /home/rsg/counts/outs/analysis
-- Per-molecule read information:            /home/rsg/counts/outs/molecule_info.h5
-- CRISPR-specific analysis:                 null
-- Loupe Browser file:                       /home/rsg/counts/outs/cloupe.cloupe
-- Feature Reference:                        null
-- Target Panel File:                        null
-
-Waiting 6 seconds for UI to do final refresh.
-Pipestance completed successfully!
-
-2024-10-29 17:25:39 Shutting down.</code></pre>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of genes </span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> ~/Share/data_wrangling/counts/outs/filtered_feature_bc_matrix/features.tsv.gz <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> ~/Share/data_wrangling/counts/outs/raw_feature_bc_matrix/features.tsv.gz <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of cells</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> ~/Share/data_wrangling/counts/outs/filtered_feature_bc_matrix/barcodes.tsv.gz <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> ~/Share/data_wrangling/counts/outs/raw_feature_bc_matrix/barcodes.tsv.gz <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<p>While the count command is running, read about the <a href="https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/output/matrices">format of the feature-barcode matrices</a>.</p>
-<p>Once the count command is finished running, the pipeline outputs can be viewed with <code>ls</code>:</p>
-<div class="cell">
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>bash</strong></pre>
-</div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> ~/counts/outs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>total 119792
-drwxr-xr-x  7 jacques  staff       224 Oct 30 23:51 analysis
--rw-r--r--  1 jacques  staff   2522877 Oct 30 23:51 cloupe.cloupe
-drwxr-xr-x  5 jacques  staff       160 Oct 30 23:51 filtered_feature_bc_matrix
--rw-r--r--  1 jacques  staff    489402 Oct 30 23:51 filtered_feature_bc_matrix.h5
--rw-r--r--  1 jacques  staff       627 Oct 30 23:51 metrics_summary.csv
--rw-r--r--  1 jacques  staff   2885171 Oct 30 23:51 molecule_info.h5
--rw-r--r--  1 jacques  staff  47264234 Oct 30 23:51 possorted_genome_bam.bam
--rw-r--r--  1 jacques  staff   1744960 Oct 30 23:51 possorted_genome_bam.bam.bai
-drwxr-xr-x  5 jacques  staff       160 Oct 30 23:51 raw_feature_bc_matrix
--rw-r--r--  1 jacques  staff   3557585 Oct 30 23:51 raw_feature_bc_matrix.h5
--rw-r--r--  1 jacques  staff   2848576 Oct 30 23:51 web_summary.html</code></pre>
-</div>
-</div>
-<p>Can you locate the feature-barcode matrices? What is the difference between the <code>raw_feature_bc_matrix</code> and <code>filtered_feature_bc_matrix</code> data types?</p>
 <p>Now open the html file <code>counts/outs/web_summary.html</code> by navigating to the file in RStudio, using the Files Tab. When you click on the file, select the option to View in Web Browser. Take some time to explore the gene expression matrix outputs.</p>
+</div>
+</div>
 
 
 </section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">

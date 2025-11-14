@@ -1,3 +1,7 @@
+---
+engine: knitr
+---
+
 # Lab 1: Familiarizing yourself with the course AWS instance
 
 ::: {.callout-note icon='true'}
@@ -28,7 +32,7 @@ Most of single-cell RNA-seq analysis takes place either in `python` or in `R`. H
 For this workshop, we have installed `R` and `RStudio` on AWS. We can directly use `RStudio` (actually, `RStudio-server` since it is installed on an AWS remote server). 
 Simply open a browser and copy-paste [the following address](http://{{< meta IP >}}:8787): 
 
-```{r, echo=FALSE}
+```{r eval = FALSE, filename = "R"}
 writeLines("http://{{< meta IP >}}:8787")
 ```
 
@@ -160,12 +164,12 @@ ls -l ~/Share/
 Download the `git` repository for this course from `GitHub`: 
 
 ```{sh eval = FALSE, filename = "bash"}
-git clone https://github.com/js2264/scRNAseq_Physalia_2024.git
+git clone https://github.com/js2264/scRNAseq_Physalia_2025.git
 ```
 
 This downloads the repository for this course to your home folder on the AWS machine.  
 To get it on your local computer (to save the lectures and exercises), go to 
-[the GitHub repo page](https://github.com/js2264/scRNAseq_Physalia_2024), click on the 
+[the GitHub repo page](https://github.com/js2264/scRNAseq_Physalia_2025), click on the 
 green `Code` button, then `Download ZIP`. Beware, the download may take a significant 
 time based on your internet connection (several hundreds MB). 
 :::
@@ -218,7 +222,7 @@ Try to install the [`ffq` tool](https://github.com/pachterlab/ffq) from the Patc
 Your `(base)` conda environment should be active by default, and you will only have 
 to type: 
 
-```{shell}
+```{sh eval = FALSE, filename = "bash"}
 pip install ffq
 ```
 :::
@@ -307,20 +311,34 @@ seqkit stat ~/Share/SRR11575369_1.fq.gz
 
 ### Processed count matrices
 
-Many times, researchers will provide a filtered count matrix when they publish scRNAseq experiments (along with mandatory raw `fastq` data, of course). 
-It's way lighter than `fastq` reads, and you can go ahead with downstream analyses a lot quicker. So how do you get these matrices? Human Cell Atlas Consortium provides many processed datasets. For instance, in our case, the `Leir et al` study is available at the [following link](https://data.humancellatlas.org/explore/projects/842605c7-375a-47c5-9e2c-a71c2c00fcad). GEO also hosts processed files. 
+Many times, researchers will provide a filtered count matrix when they publish scRNAseq experiments (along with mandatory raw `fastq` data, of course). It's way lighter than `fastq` reads, and you can go ahead with downstream analyses a lot quicker. So how do you get these matrices? Human Cell Atlas Consortium provides many processed datasets. For instance, in our case, the `A single cell atlas of the human proximal epididymis reveals cell-type specific functions and distinct roles for CFTR (Leir et al, 2020)` study is available at the [following link](https://data.humancellatlas.org/explore/projects/842605c7-375a-47c5-9e2c-a71c2c00fcad). 
 
-- **Find GEO-hosted processed files for the `Leir et al` study. **
+GEO also provides access to both raw and processed files.
 
-You can download some of the processed files available in GEO from [the following webpage](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE148963).
-Scrolling down to the bottom of the page, there is a box labelled "Supplementary data". By clicking on "(custom)", a list of extra 
-supplementary files will appear. 
+::: {.callout-question .icon .callout-note}
+Find GEO-hosted processed files for the `Leir et al` study.
 
-- **Download and check the content of the count matrix, the genes and the barcodes files.  **
-- **What type of information does each file contain? How is it formatted? is it easily imported in R?  **
-- **How many cells were sequenced? How many genes were counted?  **
-- **Is it easy to interpret the count matrix? Why is it in such format?  **
-- **Comment on the file sizes between processed count matrix files and raw reads.  **
+::: {.callout-answer .icon .callout-note collapse="true"}
+Check the [Geo Dataset search page](https://www.ncbi.nlm.nih.gov/gds/). 
+
+[Search for `Leir 2020 CFTF`](https://www.ncbi.nlm.nih.gov/gds/?term=leir+2020+CFTR). 
+You should find the [following entry](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE148963). 
+
+Scrolling down to the bottom of the page, there is a box labelled "Supplementary data". By clicking on "(custom)", a list of extra supplementary files will appear.
+:::
+
+Download and check the content of the count matrix, the genes and the barcodes files. 
+
+What type of information does each file contain? How is it formatted? is it easily imported in R?
+
+::: {.callout-answer .icon .callout-note collapse="true"}
+:::
+
+- How many cells were sequenced? How many genes were counted?
+- Is it easy to interpret the count matrix? Why is it in such format?
+- Comment on the file sizes between processed count matrix files and raw reads.
+
+:::
 
 ## Bonus 
 

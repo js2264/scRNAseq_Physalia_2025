@@ -1,4 +1,4 @@
-set.seed(2024)
+set.seed(2025)
 
 knitr::opts_chunk$set(
   comment = "## ",

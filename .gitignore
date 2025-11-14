@@ -5,3 +5,6 @@ _freeze/
 Guo_testis/
 *pptx
 invoice*
+*_files
+*.rmarkdown
+content/day*/*html

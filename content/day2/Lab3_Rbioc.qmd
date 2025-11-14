@@ -98,28 +98,32 @@ BiocManager::install('HCAData')
 'getOption("repos")' replaces Bioconductor standard repositories, see 'help("repositories", package = "BiocManager")' for details.
 Replacement repositories:
     CRAN: https://cloud.r-project.org
-Bioconductor version 3.19 (BiocManager 1.30.23), R 4.4.1 (2024-06-14)
+Bioconductor version 3.22 (BiocManager 1.30.26), R 4.5.1 (2025-06-13)
 Installing package(s) 'HCAData'
-trying URL 'https://bioconductor.org/packages/3.19/data/experiment/src/contrib/HCAData_1.20.0.tar.gz'
-Content type 'application/x-gzip' length 1542758 bytes (1.5 MB)
+installing the source package ‘HCAData’
+
+trying URL 'https://bioconductor.org/packages/3.22/data/experiment/src/contrib/HCAData_1.26.0.tar.gz'
+Content type 'application/x-gzip' length 1547692 bytes (1.5 MB)
 ==================================================
 downloaded 1.5 MB
 
+R version 4.5.1 (2025-06-13) -- Great Square Root
 * installing *source* package ‘HCAData’ ...
+** this is package ‘HCAData’ version ‘1.26.0’
 ** using staged installation
 ** R
 ** inst
 ** byte-compile and prepare package for lazy loading
-
-...
-
-** byte-compile and prepare package for lazy loading
+R version 4.5.1 (2025-06-13) -- Great Square Root
 ** help
 *** installing help indices
 ** building package indices
+R version 4.5.1 (2025-06-13) -- Great Square Root
 ** installing vignettes
 ** testing if installed package can be loaded from temporary location
+R version 4.5.1 (2025-06-13) -- Great Square Root
 ** testing if installed package can be loaded from final location
+R version 4.5.1 (2025-06-13) -- Great Square Root
 ** testing if installed package keeps a record of temporary installation path
 * DONE (HCAData)
 

@@ -5,14 +5,14 @@ source("_common.R")
 .gh_url <- file.path('https://github.com', rmarkdown::metadata[['github-repo']])
 ```
 
-This is the landing page for the **"Single-cell RNA-seq analysis with R/Bioconductor"** workshop, ed. 2024.
+This is the landing page for the **"Single-cell RNA-seq analysis with R/Bioconductor"** workshop, ed. 2025.
 
 `r rebook::openingDetails(Copyright='J. Serizay, O. Ashenberg & F. Almeida-Silva', Source=.gh_url)`
-
+ 
 ## Program {.unnumbered}
 
 | **Day**   | **Time**      | **Session**                                                                                                                | **Instructor** |
-|--------------|--------------|-------------------------------|--------------|
+|---------------|---------------|---------------------------|---------------|
 | **Day 1** | 14:00 - 15:00 | [Lecture 1: Introduction to scRNAseq analysis](content/day1/Lecture1_introduction.qmd)                                     | Jacques        |
 |           | 15:10 - 16:10 | [Lecture 2: From sequencing reads to expression matrices](content/day1/Lecture2_Bcl2matrix.qmd)                            | Jacques        |
 |           | 16:10 - 17:10 | **Break**                                                                                                                  |                |
