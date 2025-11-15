@@ -263,7 +263,7 @@ What is the purpose of the index read? What does it contain?
 
 ::: {.callout-answer .icon .callout-note collapse=true}
 
-```{sh eval=FALSE, filename="bash"}
+```{sh eval=TRUE, filename="bash"}
 zcat ~/Share/data_wrangling/tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample/test_sample_S1_L001_I1_001.fastq.gz | head -n 12
 ```
 
@@ -360,7 +360,7 @@ What is the purpose of the `--id`, `--transcriptome`, `--fastqs`, `--sample`, an
 ::: {.callout-answer .icon .callout-note collapse=true}
 
 ```{sh eval=FALSE, filename="bash"}
-cellranger count --id counts --transcriptome ~/Share/refdata-gex-mm10-2020-A/ --fastqs tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample --sample test_sample
+cellranger count --id counts --transcriptome ~/Share/refdata-gex-mm10-2020-A/ --fastqs tiny-bcl/outs/fastq_path/H35KCBCXY/test_sample --sample test_sample --create-bam true
 ```
 
 ```{code}

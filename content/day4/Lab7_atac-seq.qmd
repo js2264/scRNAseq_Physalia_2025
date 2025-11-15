@@ -33,46 +33,9 @@ The dataset contains roughly ~ 10,000 cells.
 
 ## Process human PBMC dataset
 
-### Download data 
-
-Data comes from [10X Genomics](https://www.10xgenomics.com/resources/datasets/10-k-peripheral-blood-mononuclear-cells-pbm-cs-from-a-healthy-donor-1-standard-1-0-1). Direct download links are provided below.
-
-**Download the files related to scATACseq of all human PBMC cells.**
-
-```{r, eval = FALSE, filename = "R"}
-dir.create('scATAC', showWarnings = FALSE)
-options(timeout=1000)
-download.file("https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5", "scATAC/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5")
-download.file("https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_peaks.bed", "scATAC/atac_v1_pbmc_10k_peaks.bed")
-download.file("https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_singlecell.csv", "scATAC/atac_v1_pbmc_10k_singlecell.csv")
-download.file("https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_fragments.tsv.gz", "scATAC/atac_v1_pbmc_10k_fragments.tsv.gz")
-download.file("https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_fragments.tsv.gz.tbi", "scATAC/atac_v1_pbmc_10k_fragments.tsv.gz.tbi")
-```
-
-```{code}
-trying URL 'https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5'
-Content type 'binary/octet-stream' length 79995014 bytes (76.3 MB)
-==================================================
-downloaded 76.3 MB
-
-trying URL 'https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_peaks.bed'
-Content type 'binary/octet-stream' length 2145757 bytes (2.0 MB)
-==================================================
-downloaded 2.0 MB
-
-trying URL 'https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_singlecell.csv'
-Content type 'text/csv' length 35207776 bytes (33.6 MB)
-==================================================
-downloaded 33.6 MB
-
-trying URL 'https://cf.10xgenomics.com/samples/cell-atac/1.0.1/atac_v1_pbmc_10k/atac_v1_pbmc_10k_fragments.tsv.gz'
-Content type 'text/tab-separated-values' length 1960680306 bytes (1869.9 MB)
-==================================================
-downloaded 1869.9 MB
-```
-
 ### Import data 
 
+Pre-downloaded data files are available in the `~/Share/scATAC/` folder.
 Notice how the count matrix is in a `.h5` format. We have already encountered 
 this format in [Lab3](../day2/Lab3_Rbioc.qmd). Back then, we imported 
 it with `DropletUtils::read10xCounts`. 
@@ -85,7 +48,8 @@ Does this function work here?
 
 
 ```{r, eval = TRUE, filename = "R"}
-DropletUtils::read10xCounts("scATAC/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5")
+scatac <- DropletUtils::read10xCounts("~/Share/scATAC/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5")
+scatac
 ```
 
 :::
@@ -111,11 +75,11 @@ library(Seurat)
 library(Signac)
 library(rtracklayer)
 library(stringr)
-cnts <- Read10X_h5('scATAC/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5')
-features <- import('scATAC/atac_v1_pbmc_10k_peaks.bed')
+cnts <- Read10X_h5('~/Share/scATAC/atac_v1_pbmc_10k_filtered_peak_bc_matrix.h5')
+features <- import('~/Share/scATAC/atac_v1_pbmc_10k_peaks.bed')
 features$peak <- as.character(features) |> str_replace(':', '-')
 metadata <- read.csv(
-  file = "scATAC/atac_v1_pbmc_10k_singlecell.csv",
+  file = "~/Share/scATAC/atac_v1_pbmc_10k_singlecell.csv",
   header = TRUE,
   row.names = 1
 )
@@ -155,9 +119,8 @@ Generate human annotations from Ensembl using a parsing function from `Seurat`.
 
 ```{r, eval = TRUE, filename = "R"}
 ## - Get human gene annotations (hg19/GRCh37) to feed it into the future `ChromatinAssay`
-BiocManager::install('EnsDb.Hsapiens.v75')
 annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75)
-seqlevelsStyle(annotations) <- 'UCSC'
+GenomeInfoDb::seqlevelsStyle(annotations) <- 'UCSC'
 ```
 
 :::
@@ -171,7 +134,7 @@ Create a `ChromatinAssay` using `counts`, `features`, `fragments` and `annotatio
 assay <- Signac::CreateChromatinAssay(
     counts = cnts,
     ranges = features,
-    fragments = "scATAC/atac_v1_pbmc_10k_fragments.tsv.gz",
+    fragments = "~/Share/scATAC/atac_v1_pbmc_10k_fragments.tsv.gz",
     annotation = annotations,
     genome = "hg19",
     min.cells = 10, 

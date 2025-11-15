@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.433">
+<meta name="generator" content="quarto-1.5.55">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="J. Serizay, O. Ashenberg &amp; F. Almeida-Silva">
-<title>Single-cell RNAseq analysis with R/Bioconductor - 7&nbsp; Lab 4 - Single-cell RNA-seq data wrangling</title>
+<title>7&nbsp; Lab 4 - Single-cell RNA-seq data wrangling – Single-cell RNAseq analysis with R/Bioconductor</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,7 +20,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -31,7 +31,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -77,7 +77,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -86,6 +92,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -96,23 +103,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../content/day2/Lecture3_qualitycontrol.html">Day 2</a></li><li class="breadcrumb-item"><a href="../../content/day2/Lab4_data_wrangling_scRNAseq.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 4 - Single-cell RNA-seq data wrangling</span></a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../content/day2/Lecture3_qualitycontrol.html">Day 2</a></li><li class="breadcrumb-item"><a href="../../content/day2/Lab4_data_wrangling_scRNAseq.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 4 - Single-cell RNA-seq data wrangling</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="../../">Single-cell RNAseq analysis with R/Bioconductor</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/js2264/scRNAseq_Physalia_2025/" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/js2264/scRNAseq_Physalia_2025/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
@@ -149,9 +156,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Day 1</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -184,9 +191,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Day 2</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -213,9 +220,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
  <span class="menu-text">Day 3</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -248,9 +255,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Day 4</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -283,9 +290,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
  <span class="menu-text">Day 5</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -306,7 +313,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
     </ul>
 </div>
-</nav><div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
@@ -338,10 +345,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul>
 </li>
   <li><a href="#session-info" id="toc-session-info" class="nav-link" data-scroll-target="#session-info"><span class="header-section-number">7.5</span> Session info</a></li>
-  </ul><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/js2264/scRNAseq_Physalia_2025/edit/main/content/day2/Lab4_data_wrangling_scRNAseq.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/js2264/scRNAseq_Physalia_2025/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+  </ul><div class="toc-actions"><ul><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/edit/main/content/day2/Lab4_data_wrangling_scRNAseq.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../content/day2/Lecture3_qualitycontrol.html">Day 2</a></li><li class="breadcrumb-item"><a href="../../content/day2/Lab4_data_wrangling_scRNAseq.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 4 - Single-cell RNA-seq data wrangling</span></a></li></ol></nav><div class="quarto-title">
 <h1 class="title">
 <span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 4 - Single-cell RNA-seq data wrangling</span>
 </h1>
@@ -356,6 +363,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     
   </div>
   
+
 
 </header><div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -397,10 +405,10 @@ Aims
 <section id="load-necessary-packages" class="level3" data-number="7.1.1"><h3 data-number="7.1.1" class="anchored" data-anchor-id="load-necessary-packages">
 <span class="header-section-number">7.1.1</span> Load necessary packages</h3>
 <p>When loading libraries, we are asking R to load code for us written by someone else. It is a convenient way to leverage and reproduce methodology developed by others.</p>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -408,10 +416,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Following the previous labs, load the necessary libraries for this analysis.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -428,13 +436,13 @@ Answer
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 2.0.0 ──
+<pre><code>── Attaching core tidyverse packages ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.5
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-✔ purrr     1.0.2     
-── Conflicts ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.1     ✔ tibble    3.3.0
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.2.0     
+── Conflicts ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
@@ -456,26 +464,37 @@ Attaching package: 'MatrixGenerics'
 
 The following objects are masked from 'package:matrixStats':
 
-    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse, colCounts, colCummaxs, colCummins, colCumprods, colCumsums, colDiffs, colIQRDiffs, colIQRs, colLogSumExps,
-    colMadDiffs, colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats, colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds, colSums2, colTabulates,
-    colVarDiffs, colVars, colWeightedMads, colWeightedMeans, colWeightedMedians, colWeightedSds, colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet, rowCollapse,
-    rowCounts, rowCummaxs, rowCummins, rowCumprods, rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps, rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
-    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks, rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars, rowWeightedMads, rowWeightedMeans,
-    rowWeightedMedians, rowWeightedSds, rowWeightedVars
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse, colCounts, colCummaxs, colCummins, colCumprods, colCumsums, colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs, colMads, colMaxs, colMeans2,
+    colMedians, colMins, colOrderStats, colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds, colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads, colWeightedMeans, colWeightedMedians,
+    colWeightedSds, colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet, rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods, rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins, rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks, rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars, rowWeightedMads,
+    rowWeightedMeans, rowWeightedMedians, rowWeightedSds, rowWeightedVars
 
 Loading required package: GenomicRanges
 Loading required package: stats4
 Loading required package: BiocGenerics
+Loading required package: generics
+
+Attaching package: 'generics'
+
+The following object is masked from 'package:lubridate':
+
+    as.difftime
+
+The following object is masked from 'package:dplyr':
+
+    explain
+
+The following objects are masked from 'package:base':
+
+    as.difftime, as.factor, as.ordered, intersect, is.element, setdiff, setequal, union
+
 
 Attaching package: 'BiocGenerics'
 
-The following objects are masked from 'package:lubridate':
+The following object is masked from 'package:dplyr':
 
-    intersect, setdiff, union
-
-The following objects are masked from 'package:dplyr':
-
-    combine, intersect, setdiff, union
+    combine
 
 The following objects are masked from 'package:stats':
 
@@ -483,9 +502,8 @@ The following objects are masked from 'package:stats':
 
 The following objects are masked from 'package:base':
 
-    anyDuplicated, aperm, append, as.data.frame, basename, cbind, colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep, grepl, intersect, is.unsorted,
-    lapply, Map, mapply, match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank, rbind, Reduce, rownames, sapply, setdiff, table, tapply, union, unique,
-    unsplit, which.max, which.min
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind, colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget, order, paste,
+    pmax, pmax.int, pmin, pmin.int, Position, rank, rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique, unsplit, which.max, which.min
 
 Loading required package: S4Vectors
 
@@ -527,7 +545,7 @@ The following object is masked from 'package:purrr':
 
     reduce
 
-Loading required package: GenomeInfoDb
+Loading required package: Seqinfo
 Loading required package: Biobase
 Welcome to Bioconductor
 
@@ -688,25 +706,25 @@ names(1): counts</code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">assays</a></span><span class="op">(</span><span class="va">toy_sce</span><span class="op">)</span><span class="op">[[</span><span class="st">"counts"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
- [1,]   11    3    5    2    6    3    6    3   11     3
- [2,]    8    1    6    4    5    5    3    5    6     4
- [3,]    7    9    4    3    6    5    7    6    5     3
- [4,]    2    4    4    7    6    4    4    6    3     5
- [5,]    3    3    5    5    4    4    4    7    4     9
- [6,]    5    7    6    6    8    6    5    5    5     5
- [7,]    7    7    4    4    4    5    1    4    6     6
- [8,]    5    0    5    5    4    7    5    4    4     4
- [9,]    4    3    7    5    3    6    4    4    5     6
-[10,]    5    3    2    4    5    2    4    4    2     2</code></pre>
+ [1,]    5    3    4    6    5    7    5    7    5     4
+ [2,]    6    7   10    5    5    3    5    4    6     1
+ [3,]    5    6    4    4    6    7    3    1    3     7
+ [4,]    9    4    6    3    5    9    4    4    3     5
+ [5,]    0    4    2    3    6    2    6    7    5     4
+ [6,]    6    6    3    4    5    5    3    5    8     7
+ [7,]    6    2    6   12   11    4    8    5    5     4
+ [8,]   10    8    3    4    6    3    4    7    6     6
+ [9,]    2    4    2    2    4    7    4    2    7     6
+[10,]   10    6    6    9    2    4    8    7    4     5</code></pre>
 </div>
 </div>
 </section><section id="read-in-pancreas-counts-matrix." class="level3" data-number="7.1.3"><h3 data-number="7.1.3" class="anchored" data-anchor-id="read-in-pancreas-counts-matrix.">
 <span class="header-section-number">7.1.3</span> Read in Pancreas counts matrix.</h3>
 <p>We will now analyze a real human pancreas scRNAseq dataset. It is freely available from <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE114802">GEO: link</a>. We start by downloading the cell, features and counts matrix.</p>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -714,10 +732,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Inspect the GEO page and get the downloadable links for each file</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -752,7 +770,7 @@ Answer
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 1421 Columns: 1
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr (1): X1
 
@@ -772,10 +790,10 @@ chr (1): X1
 6 AAACCTGTCCGAGCCA-1</code></pre>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -783,10 +801,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Also read the genes and counts files into R.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -804,7 +822,7 @@ Answer
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 33694 Columns: 2
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr (2): X1, X2
 
@@ -833,9 +851,9 @@ chr (2): X1, X2
 <pre><code>New names:
 Rows: 33694 Columns: 1422
 ── Column specification
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── Delimiter: "," chr
-(1): ...1 dbl (1421): AAACCTGAGGCTCATT-1, AAACCTGAGGTGCACA-1, AAACCTGCAGGTGCCT-1, AAACCTGGTTAGAACA-1, AAACCTGTCACCACCT-1, AAACCTGTCCGAGCCA-1, AAACCTGTCGTGACAT-1, AAACGGGAGTAGTGCG-1,
-AAACGGGCAGCGTTCG-1, AAAC...
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── Delimiter: "," chr
+(1): ...1 dbl (1421): AAACCTGAGGCTCATT-1, AAACCTGAGGTGCACA-1, AAACCTGCAGGTGCCT-1, AAACCTGGTTAGAACA-1, AAACCTGTCACCACCT-1, AAACCTGTCCGAGCCA-1, AAACCTGTCGTGACAT-1, AAACGGGAGTAGTGCG-1, AAACGGGCAGCGTTCG-1, AAACGGGCATGTTCCC-1,
+AAACGGGGTCTAGTCA-1, AAAG...
 ℹ Use `spec()` to retrieve the full column specification for this data. ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 • `` -&gt; `...1`</code></pre>
 </div>
@@ -885,10 +903,10 @@ AAACGGGCAGCGTTCG-1, AAAC...
 </div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -896,10 +914,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Coerce the data into a <code>SingleCellExperiment</code> object.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -925,10 +943,10 @@ Answer
 </div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -936,10 +954,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Examine the <code>SingleCellExperiment</code> object you’ve just created. Get an idea of the size of the dataset, the different data available, etc.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1036,6 +1054,10 @@ Can you compare it to the size of the counts matrix coerced to a dense matrix?
 ::: {.callout-answer .icon .callout-note collapse=true}
 
 
+
+
+
+
 ::: {.cell filename='R'}
 
 ```{.r .cell-code}
@@ -1043,9 +1065,12 @@ object.size(sce)
 ```
 
 ::: {.cell-output .cell-output-stdout}
+
 ```
-388283304 bytes
+388283296 bytes
 ```
+
+
 :::
 
 ```{.r .cell-code}
@@ -1053,11 +1078,18 @@ object.size(as.matrix(counts(sce)))
 ```
 
 ::: {.cell-output .cell-output-stdout}
+
 ```
 383158880 bytes
 ```
+
+
 :::
 :::
+
+
+
+
 
 
 :::
@@ -1071,6 +1103,10 @@ Compare these results to the sparsity of the counts (the % of the counts equal t
 ::: {.callout-answer .icon .callout-note collapse=true}
 
 
+
+
+
+
 ::: {.cell filename='R'}
 
 ```{.r .cell-code}
@@ -1078,11 +1114,18 @@ sum(counts > 0) / (nrow(sce)*ncol(sce))
 ```
 
 ::: {.cell-output .cell-output-stdout}
+
 ```
-[1] 0.11431
+[1] 0.1143105
 ```
+
+
 :::
 :::
+
+
+
+
 
 
 :::
@@ -1092,10 +1135,10 @@ sum(counts > 0) / (nrow(sce)*ncol(sce))
 <span class="header-section-number">7.2</span> Basic QCs</h2>
 <p>You can learn a lot about your scRNA-seq data’s quality with simple plotting.<br>
 Let’s do some plotting to look at the number of reads per cell, reads per genes, expressed genes per cell (often called complexity), and rarity of genes (cells expressing genes).</p>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1103,10 +1146,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Plot the number of counts per cell, the number of expressed genes per cell, and the relationship between the two.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1126,16 +1169,24 @@ Answer
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">counts_per_cell</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">'# of counts per cell'</span>, col <span class="op">=</span> <span class="st">'wheat'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">genes_per_cell</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">'# of expressed genes per cell'</span>, col <span class="op">=</span> <span class="st">'wheat'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode" id="cb61"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">counts_per_cell</span>, <span class="va">genes_per_cell</span>, log <span class="op">=</span> <span class="st">'xy'</span>, col <span class="op">=</span> <span class="st">'wheat'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/title.html">title</a></span><span class="op">(</span><span class="st">'Counts vs genes per cell'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
 </div>
@@ -1143,10 +1194,11 @@ Answer
 </div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+</div>
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1154,10 +1206,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Look at the summary counts for genes and cells. Can you plot a histogram of counts per gene in log10 scale?</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1175,7 +1227,10 @@ Answer
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">cells_per_gene</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">'# of cells expressing each gene'</span>, col <span class="op">=</span> <span class="st">'wheat'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1184,10 +1239,10 @@ Answer
 </div>
 </div>
 <p>A very useful plot is the distribution of library complexity in the sequencing run, typically shown as a lineplot of the number of detected UMI per cell, with cells ranked in decreasing order. One can use such plot to investigate observations (potential cells) that are actually failed libraries (lower end outliers) or observations that are cell doublets (higher end outliers).</p>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1195,10 +1250,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Plot cells ranked by their number of detected genes. Comment.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1219,7 +1274,10 @@ Answer
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1237,38 +1295,38 @@ Answer
 <span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">colData</a></span><span class="op">(</span><span class="va">toy_sce</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>DataFrame with 91 rows and 7 columns
+<pre><code>DataFrame with 90 rows and 7 columns
             idx       sum  detected     total     low_lib_size   low_n_features   discard
     &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;outlier.filter&gt; &lt;outlier.filter&gt; &lt;logical&gt;
-1         cell1        57        10        57            FALSE            FALSE     FALSE
-2         cell3        48        10        48            FALSE            FALSE     FALSE
-3         cell4        45        10        45            FALSE            FALSE     FALSE
-4         cell5        51        10        51            FALSE            FALSE     FALSE
-5         cell6        47        10        47            FALSE            FALSE     FALSE
+1         cell2        50        10        50            FALSE            FALSE     FALSE
+2         cell3        46        10        46            FALSE            FALSE     FALSE
+3         cell4        52        10        52            FALSE            FALSE     FALSE
+4         cell5        55        10        55            FALSE            FALSE     FALSE
+5         cell6        51        10        51            FALSE            FALSE     FALSE
 ...         ...       ...       ...       ...              ...              ...       ...
-87       cell94        45        10        45            FALSE            FALSE     FALSE
-88       cell95        44        10        44            FALSE            FALSE     FALSE
-89       cell96        46        10        46            FALSE            FALSE     FALSE
-90       cell97        57        10        57            FALSE            FALSE     FALSE
-91       cell99        41        10        41            FALSE            FALSE     FALSE</code></pre>
+86       cell96        48        10        48            FALSE            FALSE     FALSE
+87       cell97        53        10        53            FALSE            FALSE     FALSE
+88       cell98        47        10        47            FALSE            FALSE     FALSE
+89       cell99        52        10        52            FALSE            FALSE     FALSE
+90      cell100        45        10        45            FALSE            FALSE     FALSE</code></pre>
 </div>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">toy_sce</span><span class="op">$</span><span class="va">low_lib_size</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 FALSE 
-   91 </code></pre>
+   90 </code></pre>
 </div>
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">toy_sce</span><span class="op">$</span><span class="va">low_n_features</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 FALSE 
-   91 </code></pre>
+   90 </code></pre>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1276,10 +1334,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Run <code><a href="https://rdrr.io/pkg/scuttle/man/quickPerCellQC.html">quickPerCellQC()</a></code> on the <code>SingleCellExperiment</code> object. Inspect the new <code>colData</code> of the object.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1341,26 +1399,26 @@ names(2): counts mean_centered</code></pre>
 <div class="sourceCode" id="cb74"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">assay</a></span><span class="op">(</span><span class="va">toy_sce</span>, <span class="st">'mean_centered'</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
- [1,]  5.3  0.2 -2.5  0.9 -1.7  1.7 -1.8  5.9 -1.7   2.9
- [2,]  2.3  1.2 -0.5 -0.1  0.3 -1.3  0.2  0.9 -0.7  -1.1
- [3,]  1.3 -0.8 -1.5  0.9  0.3  2.7  1.2 -0.1 -1.7  -0.1
- [4,] -3.7 -0.8  2.5  0.9 -0.7 -0.3  1.2 -2.1  0.3   2.9
- [5,] -2.7  0.2  0.5 -1.1 -0.7 -0.3  2.2 -1.1  4.3  -1.1
- [6,] -0.7  1.2  1.5  2.9  1.3  0.7  0.2 -0.1  0.3   1.9
- [7,]  1.3 -0.8 -0.5 -1.1  0.3 -3.3 -0.8  0.9  1.3  -3.1
- [8,] -0.7  0.2  0.5 -1.1  2.3  0.7 -0.8 -1.1 -0.7   1.9
- [9,] -1.7  2.2  0.5 -2.1  1.3 -0.3 -0.8 -0.1  1.3  -1.1
-[10,] -0.7 -2.8 -0.5 -0.1 -2.7 -0.3 -0.8 -3.1 -2.7  -3.1</code></pre>
+ [1,]   -2 -0.6  0.8 -0.5  1.9    0  2.1 -0.2 -0.9   0.4
+ [2,]    2  5.4 -0.2 -0.5 -2.1    0 -0.9  0.8 -3.9  -0.6
+ [3,]    1 -0.6 -1.2  0.5  1.9   -2 -3.9 -2.2  2.1  -1.6
+ [4,]   -1  1.4 -2.2 -0.5  3.9   -1 -0.9 -2.2  0.1   4.4
+ [5,]   -1 -2.6 -2.2  0.5 -3.1    1  2.1 -0.2 -0.9  -0.6
+ [6,]    1 -1.6 -1.2 -0.5 -0.1   -2  0.1  2.8  2.1  -2.6
+ [7,]   -3  1.4  6.8  5.5 -1.1    3  0.1 -0.2 -0.9  -1.6
+ [8,]    3 -1.6 -1.2  0.5 -2.1   -1  2.1  0.8  1.1   0.4
+ [9,]   -1 -2.6 -3.2 -1.5  1.9   -1 -2.9  1.8  1.1   3.4
+[10,]    1  1.4  3.8 -3.5 -1.1    3  2.1 -1.2  0.1  -1.6</code></pre>
 </div>
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">assay</a></span><span class="op">(</span><span class="va">toy_sce</span>, <span class="st">'mean_centered'</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.1712e-17</code></pre>
+<pre><code>[1] 5.155984e-19</code></pre>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1368,10 +1426,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Try to manually compute logcounts from counts and store it in a new slot.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1390,16 +1448,16 @@ Answer
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      AAACCTGAGGCTCATT-1 AAACCTGAGGTGCACA-1 AAACCTGCAGGTGCCT-1 AAACCTGGTTAGAACA-1 AAACCTGTCACCACCT-1 AAACCTGTCCGAGCCA-1 AAACCTGTCGTGACAT-1 AAACGGGAGTAGTGCG-1 AAACGGGCAGCGTTCG-1 AAACGGGCATGTTCCC-1
- [1,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [2,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [3,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [4,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [5,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [6,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [7,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [8,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
- [9,]                  0                  0            0.00000            0.00000                  0                  0                  0                  0            0.00000                  0
-[10,]                  0                  0            0.60206            0.47712                  0                  0                  0                  0            0.30103                  0</code></pre>
+ [1,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [2,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [3,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [4,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [5,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [6,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [7,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [8,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+ [9,]                  0                  0            0.00000          0.0000000                  0                  0                  0                  0            0.00000                  0
+[10,]                  0                  0            0.60206          0.4771213                  0                  0                  0                  0            0.30103                  0</code></pre>
 </div>
 </div>
 </div>
@@ -1439,27 +1497,30 @@ names(1): PCA</code></pre>
 </div>
 <div class="sourceCode" id="cb88"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/reducedDims.html">reducedDim</a></span><span class="op">(</span><span class="va">toy_sce</span>, <span class="st">'PCA'</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>             PC1        PC2       PC3       PC4        PC5       PC6        PC7       PC8        PC9
- [1,] -0.4269241  0.2770703  0.040464  0.011101 -0.0905776 -0.139943  0.0052699  0.061907  0.0949146
- [2,] -0.0752433 -0.1804089 -0.040888  0.221613  0.0017994 -0.070413  0.0074647  0.094725  0.0879006
- [3,]  0.1896939 -0.2637306  0.047464 -0.059461 -0.0294352  0.125050 -0.0538721  0.081399 -0.0419140
- [4,] -0.0052209  0.0461005 -0.143536 -0.142892 -0.1844590 -0.094570 -0.0690900 -0.014200  0.0205512
- [5,] -0.0369835 -0.1788274 -0.022743  0.101437  0.0400642 -0.027818  0.0733583  0.282297 -0.0056744
- [6,]  0.2805255  0.1934287 -0.157491  0.141569 -0.0850000 -0.115990  0.0619579  0.011684 -0.0102393
- [7,]  0.1219353 -0.0688337 -0.091505 -0.104105  0.0811481  0.057121  0.0157687  0.013568  0.1065238
- [8,] -0.3673286 -0.0019512 -0.119952  0.181115  0.0039182 -0.166871  0.0242721 -0.030501  0.0308548
- [9,] -0.0100844 -0.3204644 -0.060936  0.098437  0.2401735  0.090652 -0.0963534  0.011799  0.0153486
-[10,]  0.1970275 -0.1038143 -0.390062  0.317542 -0.2324288 -0.098581  0.1797298 -0.016561 -0.2208396</code></pre>
+<pre><code>              PC1         PC2         PC3          PC4         PC5         PC6          PC7          PC8          PC9
+ [1,] -0.10188550 -0.23960174  0.15536503 -0.080775594 -0.13690322  0.06965383  0.043806221  0.055637858  0.123582832
+ [2,]  0.37215335  0.17368706  0.26644099 -0.228314901  0.04338170  0.02321382  0.067101649  0.044882642  0.011083826
+ [3,]  0.36654612 -0.07860097  0.04431092 -0.246706533  0.25737652 -0.16367687  0.003723941 -0.006892653 -0.089377143
+ [4,]  0.15524959  0.12332265 -0.33819216 -0.024038955 -0.09504966 -0.19346908  0.006407067 -0.086882585  0.095588686
+ [5,] -0.21158239  0.29559076  0.15367895  0.004994796  0.05350840 -0.09506797  0.269603509 -0.174721545 -0.009004378
+ [6,]  0.14659364  0.03076939  0.01774083 -0.077196822  0.21168535 -0.10431330 -0.217529146  0.119906426 -0.060522731
+ [7,]  0.01972163 -0.10345740 -0.11369716 -0.329725443  0.04859178 -0.04461984 -0.214182583  0.261427871 -0.375919741
+ [8,] -0.10890088 -0.07557911 -0.22883877 -0.083608108  0.15183109  0.07007486 -0.023776399 -0.028014496 -0.004730487
+ [9,] -0.30964089 -0.11813574 -0.02746707  0.140264610  0.02586798 -0.28076820  0.258990812  0.033153159 -0.054846467
+[10,] -0.24325096  0.49796709  0.06435883  0.009012581 -0.05896095  0.15746412  0.108314868  0.474050801  0.044619857</code></pre>
 </div>
 <div class="sourceCode" id="cb90"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html">plotReducedDim</a></span><span class="op">(</span><span class="va">toy_sce</span>, <span class="st">'PCA'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+</div>
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1467,10 +1528,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Try to compute PCA, t-SNE and UMAP embeddings of the pancreas dataset using <code><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html">runPCA()</a></code>, <code><a href="https://rdrr.io/pkg/scater/man/runTSNE.html">runTSNE()</a></code> and <code><a href="https://rdrr.io/pkg/scater/man/runUMAP.html">runUMAP()</a></code> from <code>scater</code> package.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1488,21 +1549,33 @@ Answer
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">"PCA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode" id="cb92"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/runTSNE.html">runTSNE</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">"TSNE"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode" id="cb93"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html">runUMAP</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">"UMAP"</span>, colour_by <span class="op">=</span> <span class="st">'sum'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-3.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode" id="cb94"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">"UMAP"</span>, colour_by <span class="op">=</span> <span class="st">'detected'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-4.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-20-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1523,6 +1596,10 @@ Try to add an altExp (using `altExp<-` function) and swap it with the `counts` a
 ::: {.callout-answer .icon .callout-note collapse=true}
 
 
+
+
+
+
 ::: {.cell filename='R'}
 
 ```{.r .cell-code}
@@ -1530,16 +1607,21 @@ altExp(sce, "ATAC_counts") <- SummarizedExperiment(matrix(rpois(1000, 5), ncol =
 ```
 
 ::: {.cell-output .cell-output-stderr}
+
 ```
 Warning in matrix(rpois(1000, 5), ncol = ncol(sce)): data length [1000] is not a sub-multiple or multiple of the number of columns [1420]
 ```
+
+
 :::
 
 ::: {.cell-output .cell-output-stderr}
+
 ```
-Warning in .check_altexp_columns(x, value, withDimnames = withDimnames, : 'colnames(value)' are not the same as 'colnames(x)' for 'altExp<-'. This will be an error in the next release of
-Bioconductor.
+Warning in .check_altexp_columns(x, value, withDimnames = withDimnames, : 'colnames(value)' are not the same as 'colnames(x)' for 'altExp<-'. This will be an error in the next release of Bioconductor.
 ```
+
+
 :::
 
 ```{.r .cell-code}
@@ -1547,6 +1629,7 @@ swapAltExp(sce, "ATAC_counts", saved = "RNA_counts")
 ```
 
 ::: {.cell-output .cell-output-stdout}
+
 ```
 class: SingleCellExperiment 
 dim: 1 1420 
@@ -1560,8 +1643,14 @@ reducedDimNames(0):
 mainExpName: ATAC_counts
 altExpNames(1): RNA_counts
 ```
+
+
 :::
 :::
+
+
+
+
 
 
 :::
@@ -1583,10 +1672,10 @@ Note that features can be different between different `altExps`. -->
 <div class="sourceCode" id="cb95"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">toy_sce_filtered</span> <span class="op">&lt;-</span> <span class="va">toy_sce</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">rowData</a></span><span class="op">(</span><span class="va">toy_sce</span><span class="op">)</span><span class="op">$</span><span class="va">gene_type</span> <span class="op">==</span> <span class="st">'protein_coding'</span>, <span class="va">toy_sce</span><span class="op">$</span><span class="va">sum</span> <span class="op">&gt;</span> <span class="fl">50</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1594,10 +1683,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Filter the SCE to only include cells that have a complexity of 2000 genes or more and genes that are are expressed in 10 or more cells.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1668,7 +1757,10 @@ altExpNames(1): ATAC_counts</code></pre>
 <span><span class="va">percent_mito</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="va">mito_genes_counts</span><span class="op">)</span> <span class="op">/</span> <span class="va">sce_filtered</span><span class="op">$</span><span class="va">total</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">percent_mito</span><span class="op">*</span><span class="fl">100</span>, main <span class="op">=</span> <span class="st">'% of total counts over mitochondrial genes'</span>, col <span class="op">=</span> <span class="st">'wheat'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode" id="cb101"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">colData</a></span><span class="op">(</span><span class="va">sce_filtered</span><span class="op">)</span><span class="op">$</span><span class="va">percent_mito</span> <span class="op">&lt;-</span> <span class="va">percent_mito</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">colData</a></span><span class="op">(</span><span class="va">sce_filtered</span><span class="op">)</span><span class="op">$</span><span class="va">percent_mito</span> <span class="op">&gt;</span> <span class="fl">0.1</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1678,10 +1770,10 @@ FALSE
  1419 </code></pre>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1689,10 +1781,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Remove cells with a % of mitochondrial counts greater than 10%.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1751,10 +1843,10 @@ altExpNames(1): ATAC_counts</code></pre>
 <pre><code>NULL</code></pre>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1762,10 +1854,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Calculate the number of expressed housekeeping genes per cell (genes with a count &gt; 0) and store the number of expressed housekeeping genes per cell in <code>colData</code>.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1793,10 +1885,10 @@ Answer
 </div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1804,10 +1896,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Plot (in a boxplot) the relationship between the # of detected housekeeping genes and the total UMI count (or # of detected genes) per cell. Comment.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1825,11 +1917,16 @@ Answer
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">colData</a></span><span class="op">(</span><span class="va">sce_filtered</span><span class="op">)</span><span class="op">$</span><span class="va">total</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">colData</a></span><span class="op">(</span><span class="va">sce_filtered</span><span class="op">)</span><span class="op">$</span><span class="va">n_expressed_hkgenes</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode" id="cb110"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">colData</a></span><span class="op">(</span><span class="va">sce_filtered</span><span class="op">)</span><span class="op">$</span><span class="va">detected</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html">colData</a></span><span class="op">(</span><span class="va">sce_filtered</span><span class="op">)</span><span class="op">$</span><span class="va">n_expressed_hkgenes</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
 </div>
@@ -1837,10 +1934,11 @@ Answer
 </div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+</div>
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1848,10 +1946,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Remove cells with a # of expressed housekeeping genes greater than 85.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1901,10 +1999,10 @@ altExpNames(1): ATAC_counts</code></pre>
 <span><span class="va">genes_dissoc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">genes_dissoc</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">genes_dissoc</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1912,10 +2010,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Calculate the average gene set expression for each cell.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-35-contents" aria-controls="callout-35" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1938,10 +2036,10 @@ Answer
 </div>
 </div>
 </div>
-<div class="icon callout callout-style-default callout-question no-icon callout-titled">
+<div class="icon callout callout-style-default callout-question callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Question
@@ -1949,10 +2047,10 @@ Question
 </div>
 <div class="callout-body-container callout-body">
 <p>Plot an embedding of the dataset, using a color scale representing the average expression of genes involved in the stress signature upon cell dissociation. Comment.</p>
-<div class="icon callout callout-style-default callout-answer no-icon callout-titled">
+<div class="icon callout callout-style-default callout-answer callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-37-contents" aria-controls="callout-37" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Answer
@@ -1969,7 +2067,10 @@ Answer
 <div class="sourceCode" id="cb115"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html">plotReducedDim</a></span><span class="op">(</span><span class="va">sce_filtered</span>, dimred <span class="op">=</span> <span class="st">'PCA'</span>, colour_by <span class="op">=</span> <span class="st">'ave_expr_genes_dissoc'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell-output-display">
-<p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure"><p><img src="Lab4_data_wrangling_scRNAseq_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1981,136 +2082,125 @@ Answer
 <span class="header-section-number">7.5</span> Session info</h2>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  setting  value
- version  R version 4.4.1 (2024-06-14)
- os       macOS Sonoma 14.6.1
- system   aarch64, darwin20
+ version  R version 4.5.1 (2025-06-13)
+ os       Ubuntu 24.04.2 LTS
+ system   x86_64, linux-gnu
  ui       X11
  language (EN)
- collate  en_US.UTF-8
- ctype    en_US.UTF-8
+ collate  en_IN.utf8
+ ctype    en_IN.utf8
  tz       Europe/Paris
- date     2024-11-03
- pandoc   2.19.2 @ /opt/homebrew/bin/ (via rmarkdown)
+ date     2025-11-14
+ pandoc   3.1.3 @ /usr/bin/ (via rmarkdown)
+ quarto   1.5.55 @ /opt/quarto/bin/quarto
 
-─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  package              * version date (UTC) lib source
- abind                  1.4-8   2024-09-12 [1] CRAN (R 4.4.1)
- beachmat               2.20.0  2024-05-06 [1] Bioconduc~
- beeswarm               0.4.0   2021-06-01 [1] CRAN (R 4.4.0)
- Biobase              * 2.64.0  2024-04-30 [1] Bioconduc~
- BiocGenerics         * 0.50.0  2024-04-30 [1] Bioconduc~
- BiocNeighbors          1.22.0  2024-04-30 [1] Bioconduc~
- BiocParallel           1.38.0  2024-04-30 [1] Bioconduc~
- BiocSingular           1.20.0  2024-04-30 [1] Bioconduc~
- bit                    4.5.0   2024-09-20 [1] CRAN (R 4.4.1)
- bit64                  4.5.2   2024-09-22 [1] CRAN (R 4.4.1)
- cachem                 1.1.0   2024-05-16 [1] CRAN (R 4.4.0)
- cli                    3.6.3   2024-06-21 [1] CRAN (R 4.4.0)
- codetools              0.2-20  2024-03-31 [1] CRAN (R 4.4.1)
- colorspace             2.1-1   2024-07-26 [1] CRAN (R 4.4.0)
- cowplot                1.1.3   2024-01-22 [1] CRAN (R 4.4.0)
- crayon                 1.5.3   2024-06-20 [1] CRAN (R 4.4.0)
- DelayedArray           0.30.1  2024-05-30 [1] Bioconduc~
- DelayedMatrixStats     1.26.0  2024-04-30 [1] Bioconduc~
- devtools               2.4.5   2022-10-11 [1] CRAN (R 4.4.0)
- digest                 0.6.37  2024-08-19 [1] CRAN (R 4.4.1)
- dplyr                * 1.1.4   2023-11-17 [1] CRAN (R 4.4.0)
- ellipsis               0.3.2   2021-04-29 [1] CRAN (R 4.4.0)
- evaluate               1.0.1   2024-10-10 [1] CRAN (R 4.4.1)
- fansi                  1.0.6   2023-12-08 [1] CRAN (R 4.4.0)
- farver                 2.1.2   2024-05-13 [1] CRAN (R 4.4.0)
- fastmap                1.2.0   2024-05-15 [1] CRAN (R 4.4.0)
- FNN                    1.1.4.1 2024-09-22 [1] CRAN (R 4.4.1)
- forcats              * 1.0.0   2023-01-29 [1] CRAN (R 4.4.0)
- fs                     1.6.4   2024-04-25 [1] CRAN (R 4.4.0)
- generics               0.1.3   2022-07-05 [1] CRAN (R 4.4.0)
- GenomeInfoDb         * 1.40.1  2024-06-16 [1] Bioconduc~
- GenomeInfoDbData       1.2.12  2024-10-29 [1] Bioconductor
- GenomicRanges        * 1.56.2  2024-10-09 [1] Bioconduc~
- ggbeeswarm             0.7.2   2023-04-29 [1] CRAN (R 4.4.0)
- ggplot2              * 3.5.1   2024-04-23 [1] CRAN (R 4.4.0)
- ggrepel                0.9.6   2024-09-07 [1] CRAN (R 4.4.1)
- glue                   1.8.0   2024-09-30 [1] CRAN (R 4.4.1)
- gridExtra              2.3     2017-09-09 [1] CRAN (R 4.4.0)
- gtable                 0.3.6   2024-10-25 [1] CRAN (R 4.4.1)
- hms                    1.1.3   2023-03-21 [1] CRAN (R 4.4.0)
- htmltools              0.5.8.1 2024-04-04 [1] CRAN (R 4.4.0)
- htmlwidgets            1.6.4   2023-12-06 [1] CRAN (R 4.4.0)
- httpuv                 1.6.15  2024-03-26 [1] CRAN (R 4.4.0)
- httr                   1.4.7   2023-08-15 [1] CRAN (R 4.4.0)
- IRanges              * 2.38.1  2024-07-03 [1] Bioconduc~
- irlba                  2.3.5.1 2022-10-03 [1] CRAN (R 4.4.0)
- jsonlite               1.8.9   2024-09-20 [1] CRAN (R 4.4.1)
- knitr                  1.48    2024-07-07 [1] CRAN (R 4.4.0)
- labeling               0.4.3   2023-08-29 [1] CRAN (R 4.4.0)
- later                  1.3.2   2023-12-06 [1] CRAN (R 4.4.0)
- lattice                0.22-6  2024-03-20 [1] CRAN (R 4.4.1)
- lifecycle              1.0.4   2023-11-07 [1] CRAN (R 4.4.0)
- lubridate            * 1.9.3   2023-09-27 [1] CRAN (R 4.4.0)
- magrittr               2.0.3   2022-03-30 [1] CRAN (R 4.4.0)
- Matrix                 1.7-1   2024-10-18 [1] CRAN (R 4.4.1)
- MatrixGenerics       * 1.16.0  2024-04-30 [1] Bioconduc~
- matrixStats          * 1.4.1   2024-09-08 [1] CRAN (R 4.4.1)
- memoise                2.0.1   2021-11-26 [1] CRAN (R 4.4.0)
- mime                   0.12    2021-09-28 [1] CRAN (R 4.4.0)
- miniUI                 0.1.1.1 2018-05-18 [1] CRAN (R 4.4.0)
- munsell                0.5.1   2024-04-01 [1] CRAN (R 4.4.0)
- pillar                 1.9.0   2023-03-22 [1] CRAN (R 4.4.0)
- pkgbuild               1.4.5   2024-10-28 [1] CRAN (R 4.4.1)
- pkgconfig              2.0.3   2019-09-22 [1] CRAN (R 4.4.0)
- pkgload                1.4.0   2024-06-28 [1] CRAN (R 4.4.0)
- profvis                0.4.0   2024-09-20 [1] CRAN (R 4.4.1)
- promises               1.3.0   2024-04-05 [1] CRAN (R 4.4.0)
- purrr                * 1.0.2   2023-08-10 [1] CRAN (R 4.4.0)
- R6                     2.5.1   2021-08-19 [1] CRAN (R 4.4.0)
- Rcpp                   1.0.13  2024-07-17 [1] CRAN (R 4.4.0)
- readr                * 2.1.5   2024-01-10 [1] CRAN (R 4.4.0)
- remotes                2.5.0   2024-03-17 [1] CRAN (R 4.4.0)
- rlang                  1.1.4   2024-06-04 [1] CRAN (R 4.4.0)
- rmarkdown              2.28    2024-08-17 [1] CRAN (R 4.4.0)
- rsvd                   1.0.5   2021-04-16 [1] CRAN (R 4.4.0)
- Rtsne                  0.17    2023-12-07 [1] CRAN (R 4.4.0)
- S4Arrays               1.4.1   2024-05-30 [1] Bioconduc~
- S4Vectors            * 0.42.1  2024-07-03 [1] Bioconduc~
- ScaledMatrix           1.12.0  2024-04-30 [1] Bioconduc~
- scales                 1.3.0   2023-11-28 [1] CRAN (R 4.4.0)
- scater               * 1.32.1  2024-07-21 [1] Bioconduc~
- scuttle              * 1.14.0  2024-04-30 [1] Bioconduc~
- sessioninfo            1.2.2   2021-12-06 [1] CRAN (R 4.4.0)
- shiny                  1.9.1   2024-08-01 [1] CRAN (R 4.4.0)
- SingleCellExperiment * 1.26.0  2024-04-30 [1] Bioconduc~
- SparseArray            1.4.8   2024-05-30 [1] Bioconduc~
- sparseMatrixStats      1.16.0  2024-04-30 [1] Bioconduc~
- stringi                1.8.4   2024-05-06 [1] CRAN (R 4.4.0)
- stringr              * 1.5.1   2023-11-14 [1] CRAN (R 4.4.0)
- SummarizedExperiment * 1.34.0  2024-04-30 [1] Bioconduc~
- tibble               * 3.2.1   2023-03-20 [1] CRAN (R 4.4.0)
- tidyr                * 1.3.1   2024-01-24 [1] CRAN (R 4.4.0)
- tidyselect             1.2.1   2024-03-11 [1] CRAN (R 4.4.0)
- tidyverse            * 2.0.0   2023-02-22 [1] CRAN (R 4.4.0)
- timechange             0.3.0   2024-01-18 [1] CRAN (R 4.4.0)
- tzdb                   0.4.0   2023-05-12 [1] CRAN (R 4.4.0)
- UCSC.utils             1.0.0   2024-05-06 [1] Bioconduc~
- urlchecker             1.0.1   2021-11-30 [1] CRAN (R 4.4.0)
- usethis                3.0.0   2024-07-29 [1] CRAN (R 4.4.0)
- utf8                   1.2.4   2023-10-22 [1] CRAN (R 4.4.0)
- uwot                   0.2.2   2024-04-21 [1] CRAN (R 4.4.0)
- vctrs                  0.6.5   2023-12-01 [1] CRAN (R 4.4.0)
- vipor                  0.4.7   2023-12-18 [1] CRAN (R 4.4.0)
- viridis                0.6.5   2024-01-29 [1] CRAN (R 4.4.0)
- viridisLite            0.4.2   2023-05-02 [1] CRAN (R 4.4.0)
- vroom                  1.6.5   2023-12-05 [1] CRAN (R 4.4.0)
- withr                  3.0.2   2024-10-28 [1] CRAN (R 4.4.1)
- xfun                   0.48    2024-10-03 [1] CRAN (R 4.4.1)
- xtable                 1.8-4   2019-04-21 [1] CRAN (R 4.4.0)
- XVector                0.44.0  2024-04-30 [1] Bioconduc~
- zlibbioc               1.50.0  2024-04-30 [1] Bioconduc~
+ abind                  1.4-8   2024-09-12 [1] CRAN (R 4.5.1)
+ beachmat               2.26.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ beeswarm               0.4.0   2021-06-01 [1] CRAN (R 4.5.1)
+ Biobase              * 2.70.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ BiocGenerics         * 0.56.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ BiocNeighbors          2.4.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ BiocParallel           1.44.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ BiocSingular           1.26.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ bit                    4.6.0   2025-03-06 [1] CRAN (R 4.5.0)
+ bit64                  4.6.0-1 2025-01-16 [1] CRAN (R 4.5.0)
+ cachem                 1.1.0   2024-05-16 [1] CRAN (R 4.5.1)
+ cli                    3.6.5   2025-04-23 [1] CRAN (R 4.5.1)
+ codetools              0.2-20  2024-03-31 [2] CRAN (R 4.5.1)
+ cowplot                1.2.0   2025-07-07 [1] CRAN (R 4.5.1)
+ crayon                 1.5.3   2024-06-20 [1] CRAN (R 4.5.1)
+ DelayedArray           0.36.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ devtools               2.4.6   2025-10-03 [1] CRAN (R 4.5.1)
+ dichromat              2.0-0.1 2022-05-02 [1] CRAN (R 4.5.1)
+ digest                 0.6.38  2025-11-12 [1] CRAN (R 4.5.1)
+ dplyr                * 1.1.4   2023-11-17 [1] CRAN (R 4.5.1)
+ ellipsis               0.3.2   2021-04-29 [1] CRAN (R 4.5.1)
+ evaluate               1.0.5   2025-08-27 [1] CRAN (R 4.5.1)
+ farver                 2.1.2   2024-05-13 [1] CRAN (R 4.5.1)
+ fastmap                1.2.0   2024-05-15 [1] CRAN (R 4.5.1)
+ FNN                    1.1.4.1 2024-09-22 [1] CRAN (R 4.5.1)
+ forcats              * 1.0.1   2025-09-25 [1] CRAN (R 4.5.1)
+ fs                     1.6.6   2025-04-12 [1] CRAN (R 4.5.1)
+ generics             * 0.1.4   2025-05-09 [1] CRAN (R 4.5.1)
+ GenomicRanges        * 1.62.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ ggbeeswarm             0.7.2   2023-04-29 [1] CRAN (R 4.5.1)
+ ggplot2              * 4.0.1   2025-11-14 [1] CRAN (R 4.5.1)
+ ggrepel                0.9.6   2024-09-07 [1] CRAN (R 4.5.1)
+ glue                   1.8.0   2024-09-30 [1] CRAN (R 4.5.1)
+ gridExtra              2.3     2017-09-09 [1] CRAN (R 4.5.1)
+ gtable                 0.3.6   2024-10-25 [1] CRAN (R 4.5.1)
+ hms                    1.1.4   2025-10-17 [1] CRAN (R 4.5.1)
+ htmltools              0.5.8.1 2024-04-04 [1] CRAN (R 4.5.1)
+ htmlwidgets            1.6.4   2023-12-06 [1] CRAN (R 4.5.1)
+ IRanges              * 2.44.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ irlba                  2.3.5.1 2022-10-03 [1] CRAN (R 4.5.1)
+ jsonlite               2.0.0   2025-03-27 [1] CRAN (R 4.5.1)
+ knitr                  1.50    2025-03-16 [1] CRAN (R 4.5.1)
+ labeling               0.4.3   2023-08-29 [1] CRAN (R 4.5.1)
+ lattice                0.22-7  2025-04-02 [2] CRAN (R 4.5.1)
+ lifecycle              1.0.4   2023-11-07 [1] CRAN (R 4.5.1)
+ lubridate            * 1.9.4   2024-12-08 [1] CRAN (R 4.5.0)
+ magrittr               2.0.4   2025-09-12 [1] CRAN (R 4.5.1)
+ Matrix                 1.7-3   2025-03-11 [1] CRAN (R 4.5.1)
+ MatrixGenerics       * 1.22.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ matrixStats          * 1.5.0   2025-01-07 [1] CRAN (R 4.5.0)
+ memoise                2.0.1   2021-11-26 [1] CRAN (R 4.5.1)
+ pillar                 1.11.1  2025-09-17 [1] CRAN (R 4.5.1)
+ pkgbuild               1.4.8   2025-05-26 [1] CRAN (R 4.5.1)
+ pkgconfig              2.0.3   2019-09-22 [1] CRAN (R 4.5.1)
+ pkgload                1.4.1   2025-09-23 [1] CRAN (R 4.5.1)
+ purrr                * 1.2.0   2025-11-04 [1] CRAN (R 4.5.1)
+ R6                     2.6.1   2025-02-15 [1] CRAN (R 4.5.0)
+ RColorBrewer           1.1-3   2022-04-03 [1] CRAN (R 4.5.1)
+ Rcpp                   1.1.0   2025-07-02 [1] CRAN (R 4.5.1)
+ readr                * 2.1.5   2024-01-10 [1] CRAN (R 4.5.1)
+ remotes                2.5.0   2024-03-17 [1] CRAN (R 4.5.1)
+ rlang                  1.1.6   2025-04-11 [1] CRAN (R 4.5.1)
+ rmarkdown              2.30    2025-09-28 [1] CRAN (R 4.5.1)
+ RSpectra               0.16-2  2024-07-18 [1] CRAN (R 4.5.1)
+ rsvd                   1.0.5   2021-04-16 [1] CRAN (R 4.5.1)
+ Rtsne                  0.17    2023-12-07 [1] CRAN (R 4.5.1)
+ S4Arrays               1.10.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ S4Vectors            * 0.48.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ S7                     0.2.0   2024-11-07 [1] CRAN (R 4.5.1)
+ ScaledMatrix           1.18.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ scales                 1.4.0   2025-04-24 [1] CRAN (R 4.5.1)
+ scater               * 1.38.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ scuttle              * 1.20.0  2025-10-30 [1] Bioconductor 3.22 (R 4.5.1)
+ Seqinfo              * 1.0.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ sessioninfo            1.2.3   2025-02-05 [1] CRAN (R 4.5.0)
+ SingleCellExperiment * 1.32.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ SparseArray            1.10.1  2025-10-31 [1] Bioconductor 3.22 (R 4.5.1)
+ stringi                1.8.7   2025-03-27 [1] CRAN (R 4.5.1)
+ stringr              * 1.6.0   2025-11-04 [1] CRAN (R 4.5.1)
+ SummarizedExperiment * 1.40.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ tibble               * 3.3.0   2025-06-08 [1] CRAN (R 4.5.1)
+ tidyr                * 1.3.1   2024-01-24 [1] CRAN (R 4.5.1)
+ tidyselect             1.2.1   2024-03-11 [1] CRAN (R 4.5.1)
+ tidyverse            * 2.0.0   2023-02-22 [1] CRAN (R 4.5.1)
+ timechange             0.3.0   2024-01-18 [1] CRAN (R 4.5.1)
+ tzdb                   0.5.0   2025-03-15 [1] CRAN (R 4.5.1)
+ usethis                3.2.1   2025-09-06 [1] CRAN (R 4.5.1)
+ utf8                   1.2.6   2025-06-08 [1] CRAN (R 4.5.1)
+ uwot                   0.2.4   2025-11-10 [1] CRAN (R 4.5.1)
+ vctrs                  0.6.5   2023-12-01 [1] CRAN (R 4.5.1)
+ vipor                  0.4.7   2023-12-18 [1] CRAN (R 4.5.1)
+ viridis                0.6.5   2024-01-29 [1] CRAN (R 4.5.1)
+ viridisLite            0.4.2   2023-05-02 [1] CRAN (R 4.5.1)
+ vroom                  1.6.6   2025-09-19 [1] CRAN (R 4.5.1)
+ withr                  3.0.2   2024-10-28 [1] CRAN (R 4.5.1)
+ xfun                   0.54    2025-10-30 [1] CRAN (R 4.5.1)
+ XVector                0.50.0  2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
 
- [1] /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library
+ [1] /home/rsg/R/x86_64-pc-linux-gnu-library/4.5
+ [2] /opt/R/4.5.1/lib/R/library
+ * ── Packages attached to the search path.
 
-──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</code></pre>
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</code></pre>
 </div>
 </div>
 
@@ -2150,18 +2240,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -2193,11 +2272,50 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/js2264\.github\.io\/scRNAseq_Physalia_2025\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -2207,8 +2325,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -2220,7 +2347,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -2264,6 +2514,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -2289,6 +2540,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -2348,24 +2625,28 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="../../content/day2/Lab3_Rbioc.html" class="pagination-link">
+      <a href="../../content/day2/Lab3_Rbioc.html" class="pagination-link" aria-label="Lab 3: Introduction to R/Bioconductor">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 3: Introduction to R/Bioconductor</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../content/day3/Lecture4_clustering.html" class="pagination-link">
+      <a href="../../content/day3/Lecture4_clustering.html" class="pagination-link" aria-label="Lecture 4 - Identifying cell populations">
         <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lecture 4 - Identifying cell populations</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
-    <div class="nav-footer-left">Single-cell RNAseq analysis with R/Bioconductor |<br>
-J. Serizay, O. Ashenberg, F. Almeida-Silva</div>   
+    <div class="nav-footer-left">
+<p>Single-cell RNAseq analysis with R/Bioconductor |<br>
+J. Serizay, O. Ashenberg, F. Almeida-Silva</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
-    </div>
-    <div class="nav-footer-right">This book was built with <a href="https://quarto.org/">Quarto</a>.</div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/edit/main/content/day2/Lab4_data_wrangling_scRNAseq.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>This book was built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
   </div>
 </footer>
 

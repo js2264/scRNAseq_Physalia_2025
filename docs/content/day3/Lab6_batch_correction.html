@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="J. Serizay, O. Ashenberg &amp; F. Almeida-Silva">
+<title>11&nbsp; Lab 6: Batch correction – Single-cell RNAseq analysis with R/Bioconductor</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../content/day4/Lecture6_ATAC.html" rel="next">
+<link href="../../content/day3/Lecture5_batchcorrection.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head>
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../content/day3/Lecture4_clustering.html">Day 3</a></li><li class="breadcrumb-item"><a href="../../content/day3/Lab6_batch_correction.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 6: Batch correction</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Single-cell RNAseq analysis with R/Bioconductor</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/js2264/scRNAseq_Physalia_2025/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/program.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Program</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/Rstudio.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RStudio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/prerequisites.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prerequisites</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 1</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day1/Lecture1_introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Lecture 1 - Introduction to scRNAseq analysis</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day1/Lecture2_Bcl2matrix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Lecture 2 - From sequencing reads to expression matrices</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day1/Lab1_Intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lab 1: Familiarizing yourself with the course AWS instance</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day1/Lab2_processingreads.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lab 2: From .bcl to count matrix</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 2</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day2/Lecture3_qualitycontrol.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Lecture 3 - Quality control for scRNA-Seq data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day2/Lab3_Rbioc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Lab 3: Introduction to R/Bioconductor</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day2/Lab4_data_wrangling_scRNAseq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Lab 4 - Single-cell RNA-seq data wrangling</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 3</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day3/Lecture4_clustering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Lecture 4 - Identifying cell populations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day3/Lab5_clustering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lab 5: Dimension reduction, clustering and annotation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day3/Lecture5_batchcorrection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lecture 5 - Data integration and batch effect correction</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day3/Lab6_batch_correction.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 6: Batch correction</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 4</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day4/Lecture6_ATAC.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lecture 6 - Advances in single-cell genomics: the epigenome</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day4/Lab7_atac-seq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Lab 7: Single-cell ATAC-seq analysis workflow</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day4/Lecture7_pseudotime.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Lecture 7 - Trajectories and pseudotimes</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day4/Lab8_pseudotime.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Lab 8: Pseudotime analyses</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 5</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/day5/Lecture8_spatial-transcriptomics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Lecture 8 - Advances in single-cell genomics: spatial transcriptomics</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../content/extra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extra resources</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#read-in-pancreas-expression-matrices" id="toc-read-in-pancreas-expression-matrices" class="nav-link active" data-scroll-target="#read-in-pancreas-expression-matrices"><span class="header-section-number">11.1</span> Read in pancreas expression matrices</a></li>
+  <li><a href="#analyze-each-pancreas-dataset-without-batch-correction" id="toc-analyze-each-pancreas-dataset-without-batch-correction" class="nav-link" data-scroll-target="#analyze-each-pancreas-dataset-without-batch-correction"><span class="header-section-number">11.2</span> Analyze each pancreas dataset without batch correction</a></li>
+  <li><a href="#cluster-pancreatic-datasets-without-batch-correction" id="toc-cluster-pancreatic-datasets-without-batch-correction" class="nav-link" data-scroll-target="#cluster-pancreatic-datasets-without-batch-correction"><span class="header-section-number">11.3</span> Cluster pancreatic datasets without batch correction</a></li>
+  <li>
+<a href="#batch-correction-canonical-correlation-analysis-cca-mutual-nearest-neighbors-mnn" id="toc-batch-correction-canonical-correlation-analysis-cca-mutual-nearest-neighbors-mnn" class="nav-link" data-scroll-target="#batch-correction-canonical-correlation-analysis-cca-mutual-nearest-neighbors-mnn"><span class="header-section-number">11.4</span> Batch correction: canonical correlation analysis (CCA)+ mutual nearest neighbors (MNN)</a>
+  <ul class="collapse">
+<li><a href="#differential-gene-expression-and-visualization" id="toc-differential-gene-expression-and-visualization" class="nav-link" data-scroll-target="#differential-gene-expression-and-visualization"><span class="header-section-number">11.4.1</span> Differential gene expression and visualization</a></li>
+  </ul>
+</li>
+  <li><a href="#batch-correction-integrative-non-negative-matrix-factorization-nmf" id="toc-batch-correction-integrative-non-negative-matrix-factorization-nmf" class="nav-link" data-scroll-target="#batch-correction-integrative-non-negative-matrix-factorization-nmf"><span class="header-section-number">11.5</span> Batch correction: integrative non-negative matrix factorization (NMF)</a></li>
+  <li>
+<a href="#additional-exploration" id="toc-additional-exploration" class="nav-link" data-scroll-target="#additional-exploration"><span class="header-section-number">11.6</span> Additional exploration</a>
+  <ul class="collapse">
+<li><a href="#regressing-out-unwanted-covariates" id="toc-regressing-out-unwanted-covariates" class="nav-link" data-scroll-target="#regressing-out-unwanted-covariates"><span class="header-section-number">11.6.1</span> Regressing out unwanted covariates</a></li>
+  <li><a href="#kbet" id="toc-kbet" class="nav-link" data-scroll-target="#kbet"><span class="header-section-number">11.6.2</span> kBET</a></li>
+  </ul>
+</li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements"><span class="header-section-number">11.7</span> Acknowledgements</a></li>
+  <li><a href="#session-info" id="toc-session-info" class="nav-link" data-scroll-target="#session-info"><span class="header-section-number">11.8</span> Session info</a></li>
+  </ul><div class="toc-actions"><ul><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/edit/main/content/day3/Lab6_batch_correction.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../content/day3/Lecture4_clustering.html">Day 3</a></li><li class="breadcrumb-item"><a href="../../content/day3/Lab6_batch_correction.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 6: Batch correction</span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title">
+<span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Lab 6: Batch correction</span>
+</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Notes
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The estimated time for this lab is around 1h20.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Aims
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Process pancreas scRNAseq datasets from different technologies.</li>
+<li>Merge the datasets and analyse them without batch correction.</li>
+<li>Use Seurat to perform batch correction using canonical correlation analysis (CCA) and mutual nearest neighbors (MNN).</li>
+<li>Use LIGER to perform batch correction using integrative non-negative matrix factorization.</li>
+</ul>
+</div>
+</div>
+<p>In this lab, we will look at different single cell RNA-seq datasets collected from pancreatic islets. We will look at how different batch correction methods affect our data analysis.</p>
+<section id="read-in-pancreas-expression-matrices" class="level2" data-number="11.1"><h2 data-number="11.1" class="anchored" data-anchor-id="read-in-pancreas-expression-matrices">
+<span class="header-section-number">11.1</span> Read in pancreas expression matrices</h2>
+<p>Four different datasets are provided in the <code>~/Share/batch_correction/</code> directory. These datasets were collected using different single cell RNA-seq technologies.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Import the four datasets into R. What is the size and sparsity of each dataset?</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">celseq.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"~/Share/batch_correction/pancreas_multi_celseq_expression_matrix.txt.gz"</span><span class="op">)</span></span>
+<span><span class="va">celseq2.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"~/Share/batch_correction/pancreas_multi_celseq2_expression_matrix.txt.gz"</span><span class="op">)</span></span>
+<span><span class="va">fluidigmc1.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"~/Share/batch_correction/pancreas_multi_fluidigmc1_expression_matrix.txt.gz"</span><span class="op">)</span></span>
+<span><span class="va">smartseq2.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"~/Share/batch_correction/pancreas_multi_smartseq2_expression_matrix.txt.gz"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>Coerce each dataset to a sparse matrix for efficiency.</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Convert to sparse matrices for efficiency</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org">Matrix</a></span><span class="op">)</span></span>
+<span><span class="va">celseq.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/methods/as.html">as</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">celseq.data</span><span class="op">)</span>, <span class="st">"dgCMatrix"</span><span class="op">)</span></span>
+<span><span class="va">celseq2.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/methods/as.html">as</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">celseq2.data</span><span class="op">)</span>, <span class="st">"dgCMatrix"</span><span class="op">)</span></span>
+<span><span class="va">fluidigmc1.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/methods/as.html">as</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">fluidigmc1.data</span><span class="op">)</span>, <span class="st">"dgCMatrix"</span><span class="op">)</span></span>
+<span><span class="va">smartseq2.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/methods/as.html">as</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">smartseq2.data</span><span class="op">)</span>, <span class="st">"dgCMatrix"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section id="analyze-each-pancreas-dataset-without-batch-correction" class="level2" data-number="11.2"><h2 data-number="11.2" class="anchored" data-anchor-id="analyze-each-pancreas-dataset-without-batch-correction">
+<span class="header-section-number">11.2</span> Analyze each pancreas dataset without batch correction</h2>
+<p>We will first analyze each dataset separately to see if there are any differences between the datasets.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What is the size of each single cell RNA-seq dataset?</p>
+<p>Briefly describe the technology used to collect each dataset.</p>
+<p>Which datasets do you expect to be different and which do you expect to be similar?</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">celseq.data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20148  1728</code></pre>
+</div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">celseq2.data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 19140  3072</code></pre>
+</div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">fluidigmc1.data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 25463   638</code></pre>
+</div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">smartseq2.data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 26179  3514</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a Seurat object for each dataset, and look at the distributions of number of genes per cell.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat">Seurat</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: SeuratObject</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: sp</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'SeuratObject'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, t</code></pre>
+</div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># CEL-Seq (https://www.cell.com/cell-reports/fulltext/S2211-1247(12)00228-8)</span></span>
+<span><span class="va">celseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateSeuratObject.html">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">celseq.data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">celseq</span>, <span class="st">"nFeature_RNA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/coerce_seurat-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># CEL-Seq2 https://www.cell.com/molecular-cell/fulltext/S1097-2765(09)00641-8</span></span>
+<span><span class="va">celseq2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateSeuratObject.html">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">celseq2.data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Feature names cannot have underscores ('_'), replacing with dashes ('-')</code></pre>
+</div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">celseq2</span>, <span class="st">"nFeature_RNA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/coerce_seurat-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Fluidigm C1</span></span>
+<span><span class="va">fluidigmc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateSeuratObject.html">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">fluidigmc1.data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Feature names cannot have underscores ('_'), replacing with dashes ('-')</code></pre>
+</div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">fluidigmc1</span>, <span class="st">"nFeature_RNA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/coerce_seurat-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># SMART-Seq2</span></span>
+<span><span class="va">smartseq2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateSeuratObject.html">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">smartseq2.data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Feature names cannot have underscores ('_'), replacing with dashes ('-')</code></pre>
+</div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">smartseq2</span>, <span class="st">"nFeature_RNA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/coerce_seurat-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Now we will subset the data to remove cells with low gene counts and normalize the data.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Subset the data to remove cells with:</p>
+<ul>
+<li>fewer than 1750 genes for CEL-Seq;</li>
+<li>fewer than 2500 genes for CEL-Seq2;</li>
+<li>fewer than 2500 genes for SMART-Seq2.</li>
+</ul>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">celseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">celseq</span>, subset <span class="op">=</span> <span class="va">nFeature_RNA</span> <span class="op">&gt;</span> <span class="fl">1750</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">celseq</span>, <span class="st">"nFeature_RNA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/subset_seurat-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">celseq2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">celseq2</span>, subset <span class="op">=</span> <span class="va">nFeature_RNA</span> <span class="op">&gt;</span> <span class="fl">2500</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">celseq2</span>, <span class="st">"nFeature_RNA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/subset_seurat-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">smartseq2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">smartseq2</span>, subset <span class="op">=</span> <span class="va">nFeature_RNA</span> <span class="op">&gt;</span> <span class="fl">2500</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">smartseq2</span>, <span class="st">"nFeature_RNA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/subset_seurat-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Now we will subsample each dataset to only have 500 cells. This is to speed up subsequent analyses. Often when we are setting up our analysis, we work with a subset of the data to make iteration across analysis decisions faster, and once we have finalized how we want to do the analysis, we work with the full dataset.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Within metadata dataframe, save what technology each dataset was generated with.</li>
+<li>Randomly subsample each full dataset to 500 cells.</li>
+</ul>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">celseq</span><span class="op">[[</span><span class="st">"tech"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"celseq"</span></span>
+<span><span class="va">celseq2</span><span class="op">[[</span><span class="st">"tech"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"celseq2"</span></span>
+<span><span class="va">fluidigmc1</span><span class="op">[[</span><span class="st">"tech"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"fluidigmc1"</span></span>
+<span><span class="va">smartseq2</span><span class="op">[[</span><span class="st">"tech"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"smartseq2"</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">celseq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tech"</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">celseq2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tech"</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">fluidigmc1</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tech"</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">smartseq2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tech"</span></span>
+<span></span>
+<span><span class="co"># This code sub-samples the data in order to speed up calculations and not use too much memory.</span></span>
+<span><span class="va">celseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">celseq</span>, downsample <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">celseq2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">celseq2</span>, downsample <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">fluidigmc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">fluidigmc1</span>, downsample <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">smartseq2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">smartseq2</span>, downsample <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section id="cluster-pancreatic-datasets-without-batch-correction" class="level2" data-number="11.3"><h2 data-number="11.3" class="anchored" data-anchor-id="cluster-pancreatic-datasets-without-batch-correction">
+<span class="header-section-number">11.3</span> Cluster pancreatic datasets without batch correction</h2>
+<p>We will first merge all the cells from the four different experiments together, and cluster all the pancreatic islet datasets to see whether there is a batch effect.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Merge the datasets into a single Seurat object.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Merge Seurat objects. Original sample identities are stored in gcdata[["tech"]].</span></span>
+<span><span class="co"># Cell names will now have the format tech_cellID (smartseq2_cell1...)</span></span>
+<span><span class="va">add.cell.ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"celseq"</span>, <span class="st">"celseq2"</span>, <span class="st">"fluidigmc1"</span>, <span class="st">"smartseq2"</span><span class="op">)</span></span>
+<span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html">merge</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">celseq</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">celseq2</span>, <span class="va">fluidigmc1</span>, <span class="va">smartseq2</span><span class="op">)</span>, add.cell.ids <span class="op">=</span> <span class="va">add.cell.ids</span>, merge.data <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Examine gcdata. Notice that there are now 4 counts layers, one layer for each technology.</span></span>
+<span><span class="va">gcdata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>An object of class Seurat 
+33633 features across 2000 samples within 1 assay 
+Active assay: RNA (33633 features, 0 variable features)
+ 4 layers present: counts.1, counts.2, counts.3, counts.4</code></pre>
+</div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/VlnPlot.html">VlnPlot</a></span><span class="op">(</span><span class="va">gcdata</span>, <span class="st">"nFeature_RNA"</span>, group.by <span class="op">=</span> <span class="st">"tech"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/no_batch_correction-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>After merging, we normalize the data with <code>LogNormalize</code> method, and identify the 2000 most variable genes for each dataset, using the <code>vst</code> approach. Then we scale the data using <code>ScaleData</code>.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What is the difference between <code>SelectIntegrationFeatures</code> and <code>FindVariableFeatures</code> in Seurat? Take a look at the documentation for both functions.</p>
+<p>Run <code>NormalizeData</code>, <code>FindVariableFeatures</code>, and <code>ScaleData</code> on the merged dataset.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/NormalizeData.html">NormalizeData</a></span><span class="op">(</span><span class="va">gcdata</span>, normalization.method <span class="op">=</span> <span class="st">"LogNormalize"</span>, scale.factor <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Normalizing layer: counts.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Normalizing layer: counts.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Normalizing layer: counts.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Normalizing layer: counts.4</code></pre>
+</div>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindVariableFeatures.html">FindVariableFeatures</a></span><span class="op">(</span><span class="va">gcdata</span>, nfeatures <span class="op">=</span> <span class="fl">2000</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, selection.method <span class="op">=</span> <span class="st">"vst"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Finding variable features for layer counts.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Finding variable features for layer counts.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Finding variable features for layer counts.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Finding variable features for layer counts.4</code></pre>
+</div>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html">ScaleData</a></span><span class="op">(</span><span class="va">gcdata</span>, features <span class="op">=</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html">VariableFeatures</a></span><span class="op">(</span><span class="va">gcdata</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Centering and scaling data matrix</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Now that data is merged, normalized, and scaled, we will perform principal component analysis (PCA) and visualize the data.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Do PCA on data including only the variable genes.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">gcdata</span>, features <span class="op">=</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html">VariableFeatures</a></span><span class="op">(</span><span class="va">gcdata</span><span class="op">)</span>, npcs <span class="op">=</span> <span class="fl">40</span>, ndims.print <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, nfeatures.print <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>PC_ 1 
+Positive:  CHGB, SCG2, ABCC8, PAM, CHGA 
+Negative:  IFITM3, ZFP36L1, TACSTD2, ANXA4, LGALS3 
+PC_ 2 
+Positive:  KRT8, CLDN4, ELF3, GATM, CFB 
+Negative:  SPARC, COL1A2, COL3A1, COL15A1, COL5A1 
+PC_ 3 
+Positive:  CCDC142, RAMP2-AS1, L2HGDH, NLRP12, TMEM212 
+Negative:  PDGFRB, COL15A1, SFRP2, COL1A2, BGN 
+PC_ 4 
+Positive:  CFTR, AQP1, VTCN1, SPP1, KRT19 
+Negative:  CPA2, CTRC, CTRB1, CPA1, CTRB2 
+PC_ 5 
+Positive:  PFKFB2, HADH, INS, IAPP, ADCYAP1 
+Negative:  TM4SF4, GC, IRX2, ARX, CRYBA2 </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Color the PCA biplot by the scRNA-seq technology.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html">DimPlot</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"pca"</span>, dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, group.by <span class="op">=</span> <span class="st">"tech"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/no_batch_correction4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Now we will cluster the cells and visualize the clusters in reduced dimensional space.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Find the k=20 nearest neighbors for each cell in the PCA space, using the first 20 principal components.</li>
+<li>Cluster the cells.</li>
+<li>Perform UMAP embedding and visualize clustering results in 2D.</li>
+</ul>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Cluster the cells using the first twenty principal components.</span></span>
+<span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindNeighbors.html">FindNeighbors</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"pca"</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, k.param <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Computing nearest neighbor graph</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Computing SNN</code></pre>
+</div>
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindClusters.html">FindClusters</a></span><span class="op">(</span><span class="va">gcdata</span>, resolution <span class="op">=</span> <span class="fl">0.8</span>, algorithm <span class="op">=</span> <span class="fl">1</span>, random.seed <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 2000
+Number of edges: 59992
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9181
+Number of communities: 16
+Elapsed time: 0 seconds</code></pre>
+</div>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create a UMAP visualization. </span></span>
+<span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html">RunUMAP</a></span><span class="op">(</span><span class="va">gcdata</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, reduction <span class="op">=</span> <span class="st">"pca"</span>, n.neighbors <span class="op">=</span> <span class="fl">15</span>, min.dist <span class="op">=</span> <span class="fl">0.5</span>, spread <span class="op">=</span> <span class="fl">1</span>, metric <span class="op">=</span> <span class="st">"euclidean"</span>, seed.use <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:30 UMAP embedding parameters a = 0.583 b = 1.334</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:30 Read 2000 rows and found 20 numeric columns</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:30 Using FNN for neighbor search, n_neighbors = 15</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:30 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 15
+16:34:31 Initializing from normalized Laplacian + noise (using RSpectra)
+16:34:31 Commencing optimization for 500 epochs, with 39324 positive edges
+16:34:31 Using rng type: pcg
+16:34:32 Optimization finished</code></pre>
+</div>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Visualize the Leiden clustering and the batches on the UMAP. </span></span>
+<span><span class="co"># Remember, the clustering is stored in @meta.data in column seurat_clusters and the technology is</span></span>
+<span><span class="co"># stored in the column tech. Remember you can also use DimPlot</span></span>
+<span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html">DimPlot</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"seurat_clusters"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/no_batch_correction5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html">DimPlot</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"tech"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/no_batch_correction5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Are you surprised by the results? Compare to your expectations from the PC biplot of PC1 vs PC2.</p>
+<p>What explains these results?</p>
+</div>
+</div>
+<p>We can assess the quality of the clustering by calculating the adjusted rand index (ARI) between the technology and the cluster labels. This goes between 0 (completely dissimilar clustering) to 1 (identical clustering). The adjustment corrects for chance grouping between cluster elements.</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://matthewvavrek.com/programs-and-code/fossil/">fossil</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: maps</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: shapefiles</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: foreign</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'shapefiles'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:foreign':
+
+    read.dbf, write.dbf</code></pre>
+</div>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ari</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">gcdata</span><span class="op">[[</span><span class="op">]</span><span class="op">]</span>, <span class="va">tech</span>, <span class="va">seurat_clusters</span><span class="op">)</span></span>
+<span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/mapvalues.html">mapvalues</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span>, from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"celseq"</span>, <span class="st">"celseq2"</span>, <span class="st">"fluidigmc1"</span>, <span class="st">"smartseq2"</span><span class="op">)</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/fossil/man/rand.index.html">adj.rand.index</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">seurat_clusters</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.788981</code></pre>
+</div>
+</div>
+</section><section id="batch-correction-canonical-correlation-analysis-cca-mutual-nearest-neighbors-mnn" class="level2" data-number="11.4"><h2 data-number="11.4" class="anchored" data-anchor-id="batch-correction-canonical-correlation-analysis-cca-mutual-nearest-neighbors-mnn">
+<span class="header-section-number">11.4</span> Batch correction: canonical correlation analysis (CCA)+ mutual nearest neighbors (MNN)</h2>
+<p>We will now use Seurat to see to what extent it can remove potential batch effects.</p>
+<p>The first piece of code will identify variable genes that are highly variable in at least 2/4 datasets. We will use these variable genes in our batch correction.</p>
+<p>Why would we implement such a requirement?</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The integration workflow in Seurat requires the identification of variable genes that are variable across most samples. Use the <code>IntegrateLayers</code> function, with the CCAIntegration method, to identify anchors on the 4 pancreatic islet datasets, commonly shared variable genes across samples, and integrate samples.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/IntegrateLayers.html">IntegrateLayers</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">gcdata</span>, method <span class="op">=</span> <span class="va">CCAIntegration</span>, orig.reduction <span class="op">=</span> <span class="st">"pca"</span>, new.reduction <span class="op">=</span> <span class="st">"integrated.cca"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Now that the integration anchors have been used to integrate multiple datasets, we will perform the same clustering analysis as before.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Perform analysis in the new integrated.cca dimensional reduction space.</li>
+<li>Cluster the cells.</li>
+<li>Perform UMAP embedding and visualize clustering results in 2D.</li>
+</ul>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Re-join the four layers after integration.</span></span>
+<span><span class="va">gcdata</span><span class="op">[[</span><span class="st">"RNA"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/SplitLayers.html">JoinLayers</a></span><span class="op">(</span><span class="va">gcdata</span><span class="op">[[</span><span class="st">"RNA"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Clustering</span></span>
+<span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindNeighbors.html">FindNeighbors</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"integrated.cca"</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, k.param <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Computing nearest neighbor graph</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Computing SNN</code></pre>
+</div>
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindClusters.html">FindClusters</a></span><span class="op">(</span><span class="va">gcdata</span>, resolution <span class="op">=</span> <span class="fl">0.8</span>, algorithm <span class="op">=</span> <span class="fl">1</span>, random.seed <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 2000
+Number of edges: 84898
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8422
+Number of communities: 8
+Elapsed time: 0 seconds</code></pre>
+</div>
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># UMAP</span></span>
+<span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html">RunUMAP</a></span><span class="op">(</span><span class="va">gcdata</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>, reduction <span class="op">=</span> <span class="st">"integrated.cca"</span>, n.neighbors <span class="op">=</span> <span class="fl">15</span>, min.dist <span class="op">=</span> <span class="fl">0.5</span>, spread <span class="op">=</span> <span class="fl">1</span>, metric <span class="op">=</span> <span class="st">"euclidean"</span>, seed.use <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:44 UMAP embedding parameters a = 0.583 b = 1.334</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:44 Read 2000 rows and found 30 numeric columns</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:44 Using FNN for neighbor search, n_neighbors = 15</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>16:34:44 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 15
+16:34:45 Initializing from normalized Laplacian + noise (using RSpectra)
+16:34:45 Commencing optimization for 500 epochs, with 44152 positive edges
+16:34:45 Using rng type: pcg
+16:34:46 Optimization finished</code></pre>
+</div>
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Visualize the Louvain clustering and the batches on the UMAP. </span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html">DimPlot</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"seurat_clusters"</span><span class="op">)</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html">DimPlot</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"tech"</span><span class="op">)</span></span>
+<span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/batchcorrect_Seurat2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Individually Visualize each technology dataset.</span></span>
+<span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html">DimPlot</a></span><span class="op">(</span><span class="va">gcdata</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, split.by <span class="op">=</span> <span class="st">"tech"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/batchcorrect_Seurat2-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Let’s look again to see how the adjusted rand index changed compared to using no batch correction.</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb90"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ari</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">gcdata</span><span class="op">[[</span><span class="op">]</span><span class="op">]</span>, <span class="va">tech</span>, <span class="va">seurat_clusters</span><span class="op">)</span></span>
+<span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/mapvalues.html">mapvalues</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span>, from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"celseq"</span>, <span class="st">"celseq2"</span>, <span class="st">"fluidigmc1"</span>, <span class="st">"smartseq2"</span><span class="op">)</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/fossil/man/rand.index.html">adj.rand.index</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">seurat_clusters</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2974902</code></pre>
+</div>
+</div>
+<section id="differential-gene-expression-and-visualization" class="level3" data-number="11.4.1"><h3 data-number="11.4.1" class="anchored" data-anchor-id="differential-gene-expression-and-visualization">
+<span class="header-section-number">11.4.1</span> Differential gene expression and visualization</h3>
+<p>We can also identify conserved marker genes across the batches. Differential gene expression is done across each batch, and the p-values are combined. (requires <code>metap</code> package installation). Note that we use the original expression data in all visualization and DE tests. We should never use values from the integrated data in DE tests, as they violate assumptions of independence among samples that are required for DE tests!</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindConservedMarkers.html">FindConservedMarkers</a></span><span class="op">(</span><span class="va">gcdata</span>, ident.1 <span class="op">=</span> <span class="fl">0</span>, grouping.var <span class="op">=</span> <span class="st">"tech"</span>, assay <span class="op">=</span> <span class="st">"RNA"</span>, print.bar <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Testing group celseq: (0) vs (3, 2, 1, 4, 5, 7, 6)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>For a (much!) faster implementation of the Wilcoxon Rank Sum Test,
+(default method for FindMarkers) please install the presto package
+--------------------------------------------
+install.packages('devtools')
+devtools::install_github('immunogenomics/presto')
+--------------------------------------------
+After installation of presto, Seurat will automatically use the more 
+efficient implementation (no further action necessary).
+This message will be shown once per session</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Testing group celseq2: (0) vs (2, 3, 6, 7, 1, 4, 5)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Testing group fluidigmc1: (0) vs (2, 1, 4, 7, 3, 6, 5)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Testing group smartseq2: (0) vs (1, 5, 4, 6, 3, 2, 7)</code></pre>
+</div>
+<div class="sourceCode" id="cb98"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">markers</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       celseq_p_val celseq_avg_log2FC celseq_pct.1 celseq_pct.2 celseq_p_val_adj celseq2_p_val celseq2_avg_log2FC celseq2_pct.1 celseq2_pct.2 celseq2_p_val_adj fluidigmc1_p_val fluidigmc1_avg_log2FC fluidigmc1_pct.1 fluidigmc1_pct.2
+IRX2   1.843476e-64          4.347707        0.921        0.090     6.200163e-60  1.283278e-51           2.570787         0.973         0.235      4.316050e-47     7.368958e-57              2.929098            0.902            0.151
+GCG    1.587414e-38          4.459474        0.987        0.833     5.338949e-34  8.000277e-48           2.934182         1.000         1.000      2.690733e-43     3.258800e-62              3.802857            1.000            0.961
+TTR    3.773468e-40          4.030896        0.987        0.851     1.269131e-35  7.743786e-49           2.524005         1.000         1.000      2.604468e-44     1.942824e-55              2.552459            1.000            0.927
+PCSK2  1.457780e-42          3.574145        0.987        0.495     4.902950e-38  6.129371e-43           1.955597         1.000         0.938      2.061491e-38     5.514796e-32              1.541255            1.000            0.860
+F10    2.770889e-25          3.810780        0.447        0.050     9.319332e-21  1.445770e-34           2.437768         0.726         0.145      4.862557e-30     1.590705e-40              2.116824            0.762            0.134
+CRYBA2 4.420424e-51          4.426638        0.974        0.250     1.486721e-46  1.105901e-39           2.274519         0.920         0.310      3.719477e-35     1.305567e-31              2.144770            0.944            0.451
+       fluidigmc1_p_val_adj smartseq2_p_val smartseq2_avg_log2FC smartseq2_pct.1 smartseq2_pct.2 smartseq2_p_val_adj     max_pval minimump_p_val
+IRX2           2.478402e-52    2.668250e-79             4.677732           0.932           0.079        8.974126e-75 1.283278e-51   1.067300e-78
+GCG            1.096032e-57    1.614807e-78             5.761539           1.000           0.979        5.431082e-74 1.587414e-38   6.459230e-78
+TTR            6.534299e-51    3.340090e-78             3.909933           1.000           0.986        1.123373e-73 3.773468e-40   1.336036e-77
+PCSK2          1.854791e-27    1.412789e-70             2.832042           1.000           0.664        4.751634e-66 5.514796e-32   5.651156e-70
+F10            5.350019e-36    2.711033e-69             3.565487           0.968           0.304        9.118018e-65 2.770889e-25   1.084413e-68
+CRYBA2         4.391014e-27    4.470082e-69             4.510868           0.986           0.546        1.503423e-64 1.305567e-31   1.788033e-68</code></pre>
+</div>
+</div>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Visualize the expression of the first 5 marker genes on UMAP across the different batches using <code>DoHeatmap</code>.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb100"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gcdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html">ScaleData</a></span><span class="op">(</span><span class="va">gcdata</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">gcdata</span><span class="op">)</span>, do.center <span class="op">=</span> <span class="cn">T</span>, do.scale <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Centering data matrix</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Different features in new layer data than already exists for scale.data</code></pre>
+</div>
+<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/DoHeatmap.html">DoHeatmap</a></span><span class="op">(</span><span class="va">gcdata</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">markers</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>, group.by <span class="op">=</span> <span class="st">"tech"</span>, disp.max <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/batchcorrect_Seurat4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Check the expression of some known marker genes for pancreatic cells (see the <a href="https://www.cell.com/cell-systems/pdfExtended/S2405-4712(16)30292-7">Human pancreas cell atlas</a>).</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"GCG"</span>, <span class="st">"INS"</span>, <span class="st">"SST"</span>, <span class="st">"PPY"</span>, <span class="st">"PRSS1"</span>, <span class="st">"KRT19"</span>, <span class="st">"PECAM1"</span>, <span class="st">"COL1A1"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://satijalab.org/seurat/reference/FeaturePlot.html">FeaturePlot</a></span><span class="op">(</span><span class="va">gcdata</span>, <span class="va">genes</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Lab6_batch_correction_files/figure-html/batchcorrect_Seurat5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section></section><section id="batch-correction-integrative-non-negative-matrix-factorization-nmf" class="level2" data-number="11.5"><h2 data-number="11.5" class="anchored" data-anchor-id="batch-correction-integrative-non-negative-matrix-factorization-nmf">
+<span class="header-section-number">11.5</span> Batch correction: integrative non-negative matrix factorization (NMF)</h2>
+<p>Here we use integrative non-negative matrix factorization (NMF/LIGER) to see to what extent it can remove potential batch effects.</p>
+<p>The important parameters in the batch correction are the number of factors (k), the penalty parameter (lambda), and the clustering resolution. The number of factors sets the number of factors (consisting of shared and dataset-specific factors) used in factorizing the matrix. The penalty parameter sets the balance between factors shared across the batches and factors specific to the individual batches. The default setting of lambda=5.0 is usually used by the Macosko lab. Resolution=1.0 is used in the Louvain clustering of the shared neighbor factors that have been quantile normalized.</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ob.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"celseq"</span> <span class="op">=</span> <span class="va">celseq</span>, <span class="st">"celseq2"</span> <span class="op">=</span> <span class="va">celseq2</span>, <span class="st">"fluidigmc1"</span> <span class="op">=</span> <span class="va">fluidigmc1</span>, <span class="st">"smartseq2"</span> <span class="op">=</span> <span class="va">smartseq2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create a LIGER object with raw counts data from each batch.</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://welch-lab.github.io/liger/">rliger</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Package `rliger` has been updated massively since version 1.99.0, including the object structure which is not compatible with old versions.
+
+We recommand you backup your old analysis before overwriting any existing result.
+
+`readLiger()` is provided for reading an RDS file storing an old object and it converts the object to the up-to-date structure.</code></pre>
+</div>
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">data.liger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/createLiger.html">createLiger</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="va">ob.list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Layers.html">LayerData</a></span><span class="op">(</span><span class="va">data</span><span class="op">[[</span><span class="st">'RNA'</span><span class="op">]</span><span class="op">]</span>, <span class="st">'counts'</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! No human mitochondrial gene found in the union of dataset "celseq"</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ calculating QC for dataset "celseq"</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ Updated QC variables: "nUMI", "nGene", "mito", "ribo", and "hemo"</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ calculating QC for dataset "celseq"
+✔ calculating QC for dataset "celseq" ... done
+
+! No human mitochondrial gene found in the union of dataset "celseq2"
+ℹ calculating QC for dataset "celseq2"
+ℹ Updated QC variables: "nUMI", "nGene", "mito", "ribo", and "hemo"
+ℹ calculating QC for dataset "celseq2"
+✔ calculating QC for dataset "celseq2" ... done
+
+ℹ calculating QC for dataset "fluidigmc1"
+ℹ Updated QC variables: "nUMI", "nGene", "mito", "ribo", and "hemo"
+ℹ calculating QC for dataset "fluidigmc1"
+✔ calculating QC for dataset "fluidigmc1" ... done
+
+! No human mitochondrial gene found in the union of dataset "smartseq2"
+ℹ calculating QC for dataset "smartseq2"
+ℹ Updated QC variables: "nUMI", "nGene", "mito", "ribo", and "hemo"
+ℹ calculating QC for dataset "smartseq2"
+✔ calculating QC for dataset "smartseq2" ... done</code></pre>
+</div>
+<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Normalize gene expression for each batch.</span></span>
+<span><span class="va">data.liger</span> <span class="op">&lt;-</span> <span class="fu">rliger</span><span class="fu">::</span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/normalize.html">normalize</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ Normalizing datasets "celseq"
+✔ Normalizing datasets "celseq" ... done
+
+ℹ Normalizing datasets "celseq2"
+✔ Normalizing datasets "celseq2" ... done
+
+ℹ Normalizing datasets "fluidigmc1"
+✔ Normalizing datasets "fluidigmc1" ... done
+
+ℹ Normalizing datasets "smartseq2"
+✔ Normalizing datasets "smartseq2" ... done</code></pre>
+</div>
+<div class="sourceCode" id="cb114"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Find variable genes for LIGER analysis. Identify variable genes that are variable across most samples.</span></span>
+<span><span class="va">var.genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SelectIntegrationFeatures.html">SelectIntegrationFeatures</a></span><span class="op">(</span><span class="va">ob.list</span>, nfeatures <span class="op">=</span> <span class="fl">2000</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, fvf.nfeatures <span class="op">=</span> <span class="fl">2000</span>, selection.method <span class="op">=</span> <span class="st">"vst"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>No variable features found for object1 in the object.list. Running FindVariableFeatures ...
+Finding variable features for layer counts
+No variable features found for object2 in the object.list. Running FindVariableFeatures ...
+Finding variable features for layer counts
+No variable features found for object3 in the object.list. Running FindVariableFeatures ...
+Finding variable features for layer counts
+No variable features found for object4 in the object.list. Running FindVariableFeatures ...
+Finding variable features for layer counts</code></pre>
+</div>
+<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">data.liger</span><span class="op">@</span><span class="va">varFeatures</span> <span class="op">&lt;-</span> <span class="va">var.genes</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/liger-class.html">varFeatures</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2000</code></pre>
+</div>
+</div>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Scale the gene expression across the datasets.</p>
+<p>Why does LIGER not center the data?</p>
+<p><em>Hint:</em> think about the use of non-negative matrix factorization and the constraints that this imposes.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">data.liger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/scaleNotCenter.html">scaleNotCenter</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Next, we will run the integrative non-negative matrix factorization.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use the <code>runIntegration</code> function to perform the integrative non-negative matrix factorization.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">data.liger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/runIntegration.html">runIntegration</a></span><span class="op">(</span><span class="va">data.liger</span>, k <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>What do matrices H, V, and W represent, and what are their dimensions?</p>
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/ligerDataset-class.html">getMatrix</a></span><span class="op">(</span><span class="va">data.liger</span>, <span class="st">"H"</span><span class="op">)</span><span class="op">$</span><span class="va">celseq</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/ligerDataset-class.html">getMatrix</a></span><span class="op">(</span><span class="va">data.liger</span>, <span class="st">"V"</span><span class="op">)</span><span class="op">$</span><span class="va">celseq</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/ligerDataset-class.html">getMatrix</a></span><span class="op">(</span><span class="va">data.liger</span>, <span class="st">"W"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>Next, do normalization and clustering of cells in shared nearest factor space.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Do quantile normalization, cluster quantile normalized data</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">data.liger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/quantileNorm.html">quantileNorm</a></span><span class="op">(</span><span class="va">data.liger</span>, resolution <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">data.liger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/runCluster.html">runCluster</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>What are the dimensions of H.norm. What does this represent?</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/ligerDataset-class.html">getMatrix</a></span><span class="op">(</span><span class="va">data.liger</span>, <span class="st">"H.norm"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Let’s see what the liger data looks like mapped onto a UMAP visualization.</p>
+<div class="icon callout callout-style-default callout-question callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Run UMAP on the quantile normalized data and visualize the clusters.</p>
+<div class="icon callout callout-style-default callout-answer callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-35-contents" aria-controls="callout-35" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-35" class="callout-35-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R</strong></pre>
+</div>
+<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">data.liger</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/runUMAP.html">runUMAP</a></span><span class="op">(</span><span class="va">data.liger</span>, n_neighbors <span class="op">=</span> <span class="fl">15</span>, min_dist <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/plotDimRed.html">plotByDatasetAndCluster</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span> </span>
+<span><span class="va">p</span></span>
+<span></span>
+<span><span class="va">clusterUmapList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/plotDimRed.html">plotClusterDimRed</a></span><span class="op">(</span><span class="va">data.liger</span>, splitBy <span class="op">=</span> <span class="st">"dataset"</span>, title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">plot_grid</span><span class="op">(</span>plotlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">clusterUmapList</span><span class="op">)</span>, align <span class="op">=</span> <span class="st">"hv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Finally, let’s look at the adjusted rand index between the clusters and technology, and also the genes that load the factors used in data integration.</p>
+<div class="cell">
+<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Let's look to see how the adjusted rand index changed compared to using no batch correction.</span></span>
+<span><span class="va">tech</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/liger-class.html">cellMeta</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span><span class="op">$</span><span class="va">dataset</span></span>
+<span><span class="va">clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/liger-class.html">cellMeta</a></span><span class="op">(</span><span class="va">data.liger</span><span class="op">)</span><span class="op">$</span><span class="va">leiden_cluster</span></span>
+<span><span class="va">ari</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="st">"tech"</span> <span class="op">=</span> <span class="va">tech</span>, <span class="st">"clusters"</span> <span class="op">=</span> <span class="va">clusters</span><span class="op">)</span></span>
+<span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/mapvalues.html">mapvalues</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span>, from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"celseq"</span>, <span class="st">"celseq2"</span>, <span class="st">"fluidigmc1"</span>, <span class="st">"smartseq2"</span><span class="op">)</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/fossil/man/rand.index.html">adj.rand.index</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">tech</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">ari</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Identify shared and batch-specific marker genes from liger factorization.</span></span>
+<span><span class="co"># Use the getFactorMarkers function and choose 2 datasets.</span></span>
+<span><span class="co"># Then plot some genes of interest using plotGene functions.</span></span>
+<span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://welch-lab.github.io/liger/reference/getFactorMarkers.html">getFactorMarkers</a></span><span class="op">(</span><span class="va">data.liger</span>, dataset1 <span class="op">=</span> <span class="st">"celseq2"</span>, dataset2 <span class="op">=</span> <span class="st">"smartseq2"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/plotDimRed.html">plotGeneDimRed</a></span><span class="op">(</span><span class="va">data.liger</span>, features <span class="op">=</span> <span class="st">"INS"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Look at factor loadings in factor 9, celseq2 vs smartseq2.</span></span>
+<span><span class="fu"><a href="https://welch-lab.github.io/liger/reference/plotGeneLoadings.html">plotGeneLoadings</a></span><span class="op">(</span><span class="va">data.liger</span>, markerTable <span class="op">=</span> <span class="va">markers</span>, useFactor <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="additional-exploration" class="level2" data-number="11.6"><h2 data-number="11.6" class="anchored" data-anchor-id="additional-exploration">
+<span class="header-section-number">11.6</span> Additional exploration</h2>
+<section id="regressing-out-unwanted-covariates" class="level3" data-number="11.6.1"><h3 data-number="11.6.1" class="anchored" data-anchor-id="regressing-out-unwanted-covariates">
+<span class="header-section-number">11.6.1</span> Regressing out unwanted covariates</h3>
+<p>Learn how to regress out different technical covariates (number of UMIs, number of genes, percent mitochondrial reads) by studying <a href="https://satijalab.org/seurat/pbmc3k_tutorial.html">Seurat’s PBMC tutorial</a> and the <code><a href="https://satijalab.org/seurat/reference/ScaleData.html">ScaleData()</a></code> function.</p>
+</section><section id="kbet" class="level3" data-number="11.6.2"><h3 data-number="11.6.2" class="anchored" data-anchor-id="kbet">
+<span class="header-section-number">11.6.2</span> kBET</h3>
+<p>Within your RStudio session, install <a href="https://github.com/theislab/kBET">k-nearest neighbour batch effect test</a> and learn how to use its functionality to quantify batch effects in the pancreatic data.</p>
+</section></section><section id="acknowledgements" class="level2" data-number="11.7"><h2 data-number="11.7" class="anchored" data-anchor-id="acknowledgements">
+<span class="header-section-number">11.7</span> Acknowledgements</h2>
+<p>This document builds off a tutorial from the <a href="https://www.dropbox.com/s/aji4ielg8gc70vj/multiple_pancreas_workflow.R?dl=1">Seurat website</a> and a tutorial from the <a href="https://welch-lab.github.io/liger/articles/Integrating_multi_scRNA_data.html">LIGER website</a>.</p>
+</section><section id="session-info" class="level2" data-number="11.8"><h2 data-number="11.8" class="anchored" data-anchor-id="session-info">
+<span class="header-section-number">11.8</span> Session info</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.5.1 (2025-06-13)
+ os       Ubuntu 24.04.2 LTS
+ system   x86_64, linux-gnu
+ ui       X11
+ language (EN)
+ collate  en_IN.utf8
+ ctype    en_IN.utf8
+ tz       Europe/Paris
+ date     2025-11-14
+ pandoc   3.1.3 @ /usr/bin/ (via rmarkdown)
+ quarto   1.5.55 @ /opt/quarto/bin/quarto
+
+─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ package          * version    date (UTC) lib source
+ abind              1.4-8      2024-09-12 [1] CRAN (R 4.5.1)
+ beeswarm           0.4.0      2021-06-01 [1] CRAN (R 4.5.1)
+ Biobase            2.70.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ BiocGenerics       0.56.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ cachem             1.1.0      2024-05-16 [1] CRAN (R 4.5.1)
+ cli                3.6.5      2025-04-23 [1] CRAN (R 4.5.1)
+ cluster            2.1.8.1    2025-03-12 [2] CRAN (R 4.5.1)
+ codetools          0.2-20     2024-03-31 [2] CRAN (R 4.5.1)
+ cowplot            1.2.0      2025-07-07 [1] CRAN (R 4.5.1)
+ data.table         1.17.8     2025-07-10 [1] CRAN (R 4.5.1)
+ DelayedArray       0.36.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ deldir             2.0-4      2024-02-28 [1] CRAN (R 4.5.1)
+ devtools           2.4.6      2025-10-03 [1] CRAN (R 4.5.1)
+ dichromat          2.0-0.1    2022-05-02 [1] CRAN (R 4.5.1)
+ digest             0.6.38     2025-11-12 [1] CRAN (R 4.5.1)
+ dotCall64          1.2        2024-10-04 [1] CRAN (R 4.5.1)
+ dplyr              1.1.4      2023-11-17 [1] CRAN (R 4.5.1)
+ ellipsis           0.3.2      2021-04-29 [1] CRAN (R 4.5.1)
+ evaluate           1.0.5      2025-08-27 [1] CRAN (R 4.5.1)
+ farver             2.1.2      2024-05-13 [1] CRAN (R 4.5.1)
+ fastDummies        1.7.5      2025-01-20 [1] CRAN (R 4.5.0)
+ fastmap            1.2.0      2024-05-15 [1] CRAN (R 4.5.1)
+ fitdistrplus       1.2-4      2025-07-03 [1] CRAN (R 4.5.1)
+ FNN                1.1.4.1    2024-09-22 [1] CRAN (R 4.5.1)
+ foreign          * 0.8-90     2025-03-31 [2] CRAN (R 4.5.1)
+ fossil           * 0.4.0      2020-03-23 [1] CRAN (R 4.5.1)
+ fs                 1.6.6      2025-04-12 [1] CRAN (R 4.5.1)
+ future           * 1.67.0     2025-07-29 [1] CRAN (R 4.5.1)
+ future.apply       1.20.0     2025-06-06 [1] CRAN (R 4.5.1)
+ generics           0.1.4      2025-05-09 [1] CRAN (R 4.5.1)
+ ggbeeswarm         0.7.2      2023-04-29 [1] CRAN (R 4.5.1)
+ ggplot2            4.0.1      2025-11-14 [1] CRAN (R 4.5.1)
+ ggrastr            1.0.2      2023-06-01 [1] CRAN (R 4.5.1)
+ ggrepel            0.9.6      2024-09-07 [1] CRAN (R 4.5.1)
+ ggridges           0.5.7      2025-08-27 [1] CRAN (R 4.5.1)
+ globals            0.18.0     2025-05-08 [1] CRAN (R 4.5.1)
+ glue               1.8.0      2024-09-30 [1] CRAN (R 4.5.1)
+ goftest            1.2-3      2021-10-07 [1] CRAN (R 4.5.1)
+ gridExtra          2.3        2017-09-09 [1] CRAN (R 4.5.1)
+ gtable             0.3.6      2024-10-25 [1] CRAN (R 4.5.1)
+ h5mread            1.2.0      2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ HDF5Array          1.38.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ htmltools          0.5.8.1    2024-04-04 [1] CRAN (R 4.5.1)
+ htmlwidgets        1.6.4      2023-12-06 [1] CRAN (R 4.5.1)
+ httpuv             1.6.16     2025-04-16 [1] CRAN (R 4.5.1)
+ httr               1.4.7      2023-08-15 [1] CRAN (R 4.5.1)
+ ica                1.0-3      2022-07-08 [1] CRAN (R 4.5.1)
+ igraph             2.2.1      2025-10-27 [1] CRAN (R 4.5.1)
+ IRanges            2.44.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ irlba              2.3.5.1    2022-10-03 [1] CRAN (R 4.5.1)
+ jsonlite           2.0.0      2025-03-27 [1] CRAN (R 4.5.1)
+ KernSmooth         2.23-26    2025-01-01 [2] CRAN (R 4.5.1)
+ knitr              1.50       2025-03-16 [1] CRAN (R 4.5.1)
+ labeling           0.4.3      2023-08-29 [1] CRAN (R 4.5.1)
+ later              1.4.4      2025-08-27 [1] CRAN (R 4.5.1)
+ lattice            0.22-7     2025-04-02 [2] CRAN (R 4.5.1)
+ lazyeval           0.2.2      2019-03-15 [1] CRAN (R 4.5.1)
+ lifecycle          1.0.4      2023-11-07 [1] CRAN (R 4.5.1)
+ limma              3.66.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ listenv            0.10.0     2025-11-02 [1] CRAN (R 4.5.1)
+ lmtest             0.9-40     2022-03-21 [1] CRAN (R 4.5.1)
+ magrittr           2.0.4      2025-09-12 [1] CRAN (R 4.5.1)
+ maps             * 3.4.3      2025-05-26 [1] CRAN (R 4.5.1)
+ MASS               7.3-65     2025-02-28 [2] CRAN (R 4.5.1)
+ mathjaxr           1.8-0      2025-04-30 [1] CRAN (R 4.5.1)
+ Matrix           * 1.7-3      2025-03-11 [1] CRAN (R 4.5.1)
+ MatrixGenerics     1.22.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ matrixStats        1.5.0      2025-01-07 [1] CRAN (R 4.5.0)
+ memoise            2.0.1      2021-11-26 [1] CRAN (R 4.5.1)
+ metap              1.12       2025-03-15 [1] CRAN (R 4.5.1)
+ mime               0.13       2025-03-17 [1] CRAN (R 4.5.1)
+ miniUI             0.1.2      2025-04-17 [1] CRAN (R 4.5.1)
+ mnormt             2.1.1      2022-09-26 [1] CRAN (R 4.5.1)
+ multcomp           1.4-29     2025-10-20 [1] CRAN (R 4.5.1)
+ multtest           2.66.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ mutoss             0.1-13     2023-03-14 [1] CRAN (R 4.5.1)
+ mvtnorm            1.3-3      2025-01-10 [1] CRAN (R 4.5.1)
+ nlme               3.1-168    2025-03-31 [2] CRAN (R 4.5.1)
+ numDeriv           2016.8-1.1 2019-06-06 [1] CRAN (R 4.5.1)
+ otel               0.2.0      2025-08-29 [1] CRAN (R 4.5.1)
+ parallelly         1.45.1     2025-07-24 [1] CRAN (R 4.5.1)
+ patchwork          1.3.2      2025-08-25 [1] CRAN (R 4.5.1)
+ pbapply            1.7-4      2025-07-20 [1] CRAN (R 4.5.1)
+ pillar             1.11.1     2025-09-17 [1] CRAN (R 4.5.1)
+ pkgbuild           1.4.8      2025-05-26 [1] CRAN (R 4.5.1)
+ pkgconfig          2.0.3      2019-09-22 [1] CRAN (R 4.5.1)
+ pkgload            1.4.1      2025-09-23 [1] CRAN (R 4.5.1)
+ plotly             4.11.0     2025-06-19 [1] CRAN (R 4.5.1)
+ plotrix            3.8-4      2023-11-10 [1] CRAN (R 4.5.1)
+ plyr               1.8.9      2023-10-02 [1] CRAN (R 4.5.1)
+ png                0.1-8      2022-11-29 [1] CRAN (R 4.5.1)
+ polyclip           1.10-7     2024-07-23 [1] CRAN (R 4.5.1)
+ progressr          0.18.0     2025-11-06 [1] CRAN (R 4.5.1)
+ promises           1.5.0      2025-11-01 [1] CRAN (R 4.5.1)
+ purrr              1.2.0      2025-11-04 [1] CRAN (R 4.5.1)
+ qqconf             1.3.2      2023-04-14 [1] CRAN (R 4.5.1)
+ R6                 2.6.1      2025-02-15 [1] CRAN (R 4.5.0)
+ RANN               2.6.2      2024-08-25 [1] CRAN (R 4.5.1)
+ rbibutils          2.4        2025-11-07 [1] CRAN (R 4.5.1)
+ RColorBrewer       1.1-3      2022-04-03 [1] CRAN (R 4.5.1)
+ Rcpp               1.1.0      2025-07-02 [1] CRAN (R 4.5.1)
+ RcppAnnoy          0.0.22     2024-01-23 [1] CRAN (R 4.5.1)
+ RcppHNSW           0.6.0      2024-02-04 [1] CRAN (R 4.5.1)
+ Rdpack             2.6.4      2025-04-09 [1] CRAN (R 4.5.1)
+ remotes            2.5.0      2024-03-17 [1] CRAN (R 4.5.1)
+ reshape2           1.4.5      2025-11-12 [1] CRAN (R 4.5.1)
+ reticulate         1.44.0     2025-10-25 [1] CRAN (R 4.5.1)
+ rhdf5              2.54.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ rhdf5filters       1.22.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ Rhdf5lib           1.32.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ rlang              1.1.6      2025-04-11 [1] CRAN (R 4.5.1)
+ rliger           * 2.2.1      2025-08-26 [1] CRAN (R 4.5.1)
+ rmarkdown          2.30       2025-09-28 [1] CRAN (R 4.5.1)
+ ROCR               1.0-11     2020-05-02 [1] CRAN (R 4.5.1)
+ RSpectra           0.16-2     2024-07-18 [1] CRAN (R 4.5.1)
+ Rtsne              0.17       2023-12-07 [1] CRAN (R 4.5.1)
+ S4Arrays           1.10.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ S4Vectors          0.48.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ S7                 0.2.0      2024-11-07 [1] CRAN (R 4.5.1)
+ sandwich           3.1-1      2024-09-15 [1] CRAN (R 4.5.1)
+ scales             1.4.0      2025-04-24 [1] CRAN (R 4.5.1)
+ scattermore        1.2        2023-06-12 [1] CRAN (R 4.5.1)
+ sctransform        0.4.2      2025-04-30 [1] CRAN (R 4.5.1)
+ sessioninfo        1.2.3      2025-02-05 [1] CRAN (R 4.5.0)
+ Seurat           * 5.3.1      2025-10-29 [1] CRAN (R 4.5.1)
+ SeuratObject     * 5.2.0      2025-08-27 [1] CRAN (R 4.5.1)
+ shapefiles       * 0.7.2      2022-08-25 [1] CRAN (R 4.5.1)
+ shiny              1.11.1     2025-07-03 [1] CRAN (R 4.5.1)
+ sn                 2.1.1      2023-04-04 [1] CRAN (R 4.5.1)
+ sp               * 2.2-0      2025-02-01 [1] CRAN (R 4.5.0)
+ spam               2.11-1     2025-01-20 [1] CRAN (R 4.5.0)
+ SparseArray        1.10.1     2025-10-31 [1] Bioconductor 3.22 (R 4.5.1)
+ spatstat.data      3.1-9      2025-10-18 [1] CRAN (R 4.5.1)
+ spatstat.explore   3.5-3      2025-09-22 [1] CRAN (R 4.5.1)
+ spatstat.geom      3.6-0      2025-09-20 [1] CRAN (R 4.5.1)
+ spatstat.random    3.4-2      2025-09-21 [1] CRAN (R 4.5.1)
+ spatstat.sparse    3.1-0      2024-06-21 [1] CRAN (R 4.5.1)
+ spatstat.univar    3.1-4      2025-07-13 [1] CRAN (R 4.5.1)
+ spatstat.utils     3.2-0      2025-09-20 [1] CRAN (R 4.5.1)
+ statmod            1.5.1      2025-10-09 [1] CRAN (R 4.5.1)
+ stringi            1.8.7      2025-03-27 [1] CRAN (R 4.5.1)
+ stringr            1.6.0      2025-11-04 [1] CRAN (R 4.5.1)
+ survival           3.8-3      2024-12-17 [2] CRAN (R 4.5.1)
+ tensor             1.5.1      2025-06-17 [1] CRAN (R 4.5.1)
+ TFisher            0.2.0      2018-03-21 [1] CRAN (R 4.5.1)
+ TH.data            1.1-4      2025-09-02 [1] CRAN (R 4.5.1)
+ tibble             3.3.0      2025-06-08 [1] CRAN (R 4.5.1)
+ tidyr              1.3.1      2024-01-24 [1] CRAN (R 4.5.1)
+ tidyselect         1.2.1      2024-03-11 [1] CRAN (R 4.5.1)
+ usethis            3.2.1      2025-09-06 [1] CRAN (R 4.5.1)
+ uwot               0.2.4      2025-11-10 [1] CRAN (R 4.5.1)
+ vctrs              0.6.5      2023-12-01 [1] CRAN (R 4.5.1)
+ vipor              0.4.7      2023-12-18 [1] CRAN (R 4.5.1)
+ viridisLite        0.4.2      2023-05-02 [1] CRAN (R 4.5.1)
+ withr              3.0.2      2024-10-28 [1] CRAN (R 4.5.1)
+ xfun               0.54       2025-10-30 [1] CRAN (R 4.5.1)
+ xtable             1.8-4      2019-04-21 [1] CRAN (R 4.5.1)
+ XVector            0.50.0     2025-10-29 [1] Bioconductor 3.22 (R 4.5.1)
+ zoo                1.8-14     2025-04-10 [1] CRAN (R 4.5.1)
+
+ [1] /home/rsg/R/x86_64-pc-linux-gnu-library/4.5
+ [2] /opt/R/4.5.1/lib/R/library
+ * ── Packages attached to the search path.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+
+
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/js2264\.github\.io\/scRNAseq_Physalia_2025\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../content/day3/Lecture5_batchcorrection.html" class="pagination-link" aria-label="Lecture 5 - Data integration and batch effect correction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Lecture 5 - Data integration and batch effect correction</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../content/day4/Lecture6_ATAC.html" class="pagination-link" aria-label="Lecture 6 - Advances in single-cell genomics: the epigenome">
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Lecture 6 - Advances in single-cell genomics: the epigenome</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer"><div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Single-cell RNAseq analysis with R/Bioconductor |<br>
+J. Serizay, O. Ashenberg, F. Almeida-Silva</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/edit/main/content/day3/Lab6_batch_correction.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/js2264/scRNAseq_Physalia_2025/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>This book was built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+</body></html>
