@@ -8,7 +8,11 @@ source("_common.R")
 This is the landing page for the **"Single-cell RNA-seq analysis with R/Bioconductor"** workshop, ed. 2025.
 
 `r rebook::openingDetails(Copyright='J. Serizay, O. Ashenberg & F. Almeida-Silva', Source=.gh_url)`
- 
+
+```r
+print(R.home())
+```
+
 ## Program {.unnumbered}
 
 | **Day**   | **Time**      | **Session**                                                                                                  | **Instructor** |

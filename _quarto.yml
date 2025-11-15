@@ -1,8 +1,14 @@
 project:
   type: book
   output-dir: docs
+  resources:
+    - "**/*.pdf"
 
 IP: 54.191.190.243
+
+execute:
+  freeze: auto
+  engine: knitr
 
 book:
   title: "Single-cell RNAseq analysis with R/Bioconductor"
@@ -44,9 +50,9 @@ book:
         - content/day4/Lab7_atac-seq.qmd
         - content/day4/Lecture7_pseudotime.qmd
         - content/day4/Lab8_pseudotime.qmd
-    - part: "Day 5"
-      chapters:
-        - content/day5/Lecture8_spatial-transcriptomics.qmd
+    # - part: "Day 5"
+    #   chapters:
+    #     - content/day5/Lecture8_spatial-transcriptomics.qmd
     - content/extra.qmd
 
 format:
@@ -63,7 +69,6 @@ format:
     toc-float: 
       collapsed: false
     toc-depth: 3
-    freeze: auto
     website: 
       sidebar: 
         search: true
@@ -82,4 +87,4 @@ format:
     number-sections: true
     colorlinks: true
 
-editor: visual
+editor: source
