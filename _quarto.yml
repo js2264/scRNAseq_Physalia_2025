@@ -4,7 +4,7 @@ project:
   resources:
     - "**/*.pdf"
 
-IP: 54.191.190.243
+IP: 16.146.61.21
 
 execute:
   freeze: auto
