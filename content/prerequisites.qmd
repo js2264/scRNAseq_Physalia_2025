@@ -66,21 +66,10 @@ The following packages have been installed (along with their many dependencies, 
 
 ``` sh
 ## --- Install important R packages for single-cell RNA-seq projects
-## pak 
-sudo Rscript -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
-
-## CRAN packages
-sudo Rscript -e 'pak::pkg_install(c("tidyverse", "devtools", "umap", "corrplot", "gam", "ggbeeswarm", "ggthemes", "Matrix", "zeallot", "fossil", "rgl", "BiocManager", "Seurat", "rliger", "Signac", "multtest", "metap", "servr"))'
-
-## Bioconductor Packages
-sudo Rscript -e 'pak::pkg_install(c("airway", "SingleCellExperiment", "scran", "scater", "batchelor", "DropletUtils", "AUCell", "plyranges", "ggraph", "clustree", "celldex", "SingleR", "slingshot", "tradeSeq", "velociraptor", "BUSpaRse", "org.Mm.eg.db", "org.Hs.eg.db", "TENxPBMCData", "scRNAseq", "scDblFinder", "chromVAR", "EnsDb.Hsapiens.v75", "LoomExperiment", "biovizBase", "rebook", "bluster"))'
-
-## Github Packages
-sudo Rscript -e 'install.packages("RcppPlanc", repos = c(linux = 'https://welch-lab.r-universe.dev/bin/linux/noble/4.4/',sources = 'https://welch-lab.r-universe.dev',cran = 'https://cloud.r-project.org'))'
-
-## For ubuntu < 24.04, instal with makevars: 
-
-# withr::with_makevars( c(CFLAGS = "-w", CXXFLAGS = "-w", CPPFLAGS = "-w", LDFLAGS = ""), { .... }, assignment = "+=")
+# USING `sudo R` TO AVOID PERMISSION ISSUES WHEN INSTALLING PACKAGES GLOBALLY
+R_PATH=`sudo which R`
+R_LIBS=`sudo Rscript -e ".libPaths()[1] |> writeLines()"`
+sudo ${R_PATH}script -e "remotes::install_deps('home/ubuntu/Share/scRNAseq_Physalia_2025', repos = BiocManager::repositories(), upgrade = FALSE, lib = '${R_LIBS}')"
 
 ## --- Install other softwares (fastQC, samtools, cellranger and cellranger indexes, ffq)
 
