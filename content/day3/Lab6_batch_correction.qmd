@@ -30,23 +30,14 @@ Import the four datasets into R. What is the size and sparsity of each dataset?
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = TRUE, read2, filename = "R"}
-celseq.data <- read.table("~/Share/batch_correction/pancreas_multi_celseq_expression_matrix.txt.gz")
-celseq2.data <- read.table("~/Share/batch_correction/pancreas_multi_celseq2_expression_matrix.txt.gz")
-fluidigmc1.data <- read.table("~/Share/batch_correction/pancreas_multi_fluidigmc1_expression_matrix.txt.gz")
-smartseq2.data <- read.table("~/Share/batch_correction/pancreas_multi_smartseq2_expression_matrix.txt.gz")
+celseq.data <- round(read.table("~/Share/batch_correction/pancreas_multi_celseq_expression_matrix.txt.gz"))
+celseq2.data <- round(read.table("~/Share/batch_correction/pancreas_multi_celseq2_expression_matrix.txt.gz"))
+fluidigmc1.data <- round(read.table("~/Share/batch_correction/pancreas_multi_fluidigmc1_expression_matrix.txt.gz"))
+smartseq2.data <- round(read.table("~/Share/batch_correction/pancreas_multi_smartseq2_expression_matrix.txt.gz"))
 ```
 
-Coerce each dataset to a sparse matrix for efficiency.
-
-```{r eval = TRUE, read, filename = "R"}
-# Convert to sparse matrices for efficiency
-library(Matrix)
-celseq.data <- as(as.matrix(celseq.data), "dgCMatrix")
-celseq2.data <- as(as.matrix(celseq2.data), "dgCMatrix")
-fluidigmc1.data <- as(as.matrix(fluidigmc1.data), "dgCMatrix")
-smartseq2.data <- as(as.matrix(smartseq2.data), "dgCMatrix")
-```
 :::
+
 :::
 
 ## Analyze each pancreas dataset without batch correction
@@ -68,6 +59,7 @@ dim(fluidigmc1.data)
 dim(smartseq2.data)
 ```
 :::
+
 :::
 
 ::: {.callout-question .icon .callout-note}
@@ -75,28 +67,44 @@ Create a Seurat object for each dataset, and look at the distributions of number
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = TRUE, coerce_seurat, filename = "R"}
-library(Seurat)
+library(SingleCellExperiment)
+library(ggplot2)
 
-# CEL-Seq (https://www.cell.com/cell-reports/fulltext/S2211-1247(12)00228-8)
-celseq <- CreateSeuratObject(counts = celseq.data)
-VlnPlot(celseq, "nFeature_RNA")
+celseq_raw <- SingleCellExperiment(assay = list(counts = celseq.data)) |> scuttle::quickPerCellQC()
+celseq2_raw <- SingleCellExperiment(assay = list(counts = celseq2.data)) |> scuttle::quickPerCellQC()
+fluidigmc1_raw <- SingleCellExperiment(assay = list(counts = fluidigmc1.data)) |> scuttle::quickPerCellQC()
+smartseq2_raw <- SingleCellExperiment(assay = list(counts = smartseq2.data)) |> scuttle::quickPerCellQC()
+celseq_raw$tech <- "celseq"
+celseq2_raw$tech <- "celseq2"
+fluidigmc1_raw$tech <- "fluidigmc1"
+smartseq2_raw$tech <- "smartseq2"
 
-# CEL-Seq2 https://www.cell.com/molecular-cell/fulltext/S1097-2765(09)00641-8
-celseq2 <- CreateSeuratObject(counts = celseq2.data)
-VlnPlot(celseq2, "nFeature_RNA")
+df <- rbind(
+    data.frame(tech = celseq_raw$tech, nGenes = celseq_raw$detected, totalUMIs = celseq_raw$sum),
+    data.frame(tech = celseq2_raw$tech, nGenes = celseq2_raw$detected, totalUMIs = celseq2_raw$sum),
+    data.frame(tech = fluidigmc1_raw$tech, nGenes = fluidigmc1_raw$detected, totalUMIs = fluidigmc1_raw$sum),
+    data.frame(tech = smartseq2_raw$tech, nGenes = smartseq2_raw$detected, totalUMIs = smartseq2_raw$sum) 
+)
 
-# Fluidigm C1
-fluidigmc1 <- CreateSeuratObject(counts = fluidigmc1.data)
-VlnPlot(fluidigmc1, "nFeature_RNA")
+ggplot(df, aes(x = tech, y = nGenes)) +
+    geom_violin(trim = TRUE) +
+    geom_boxplot(width = 0.1, position = position_dodge(0.9), outlier.shape = NA) +
+    theme_minimal() +
+    ylab("Number of genes detected per cell") +
+    xlab("Technology")
 
-# SMART-Seq2
-smartseq2 <- CreateSeuratObject(counts = smartseq2.data)
-VlnPlot(smartseq2, "nFeature_RNA")
+ggplot(df, aes(x = tech, y = log10(totalUMIs))) +
+    geom_violin(trim = TRUE) +
+    geom_boxplot(width = 0.1, position = position_dodge(0.9), outlier.shape = NA) +
+    theme_minimal() +
+    ylab("Total number of UMIs detected per cell") +
+    xlab("Technology")
 ```
 :::
+
 :::
 
-Now we will subset the data to remove cells with low gene counts and normalize the data.
+Now we will subset the data to remove cells with low gene counts.
 
 ::: {.callout-question .icon .callout-note}
 Subset the data to remove cells with:
@@ -107,16 +115,13 @@ Subset the data to remove cells with:
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = TRUE, subset_seurat, filename = "R"}
-celseq <- subset(celseq, subset = nFeature_RNA > 1750)
-VlnPlot(celseq, "nFeature_RNA")
-
-celseq2 <- subset(celseq2, subset = nFeature_RNA > 2500)
-VlnPlot(celseq2, "nFeature_RNA")
-
-smartseq2 <- subset(smartseq2, subset = nFeature_RNA > 2500)
-VlnPlot(smartseq2, "nFeature_RNA")
+celseq <- celseq_raw[ , celseq_raw$detected > 1750 ]
+celseq2 <- celseq2_raw[ , celseq2_raw$detected > 2500 ]
+smartseq2 <- smartseq2_raw[ , smartseq2_raw$detected > 2500 ]
+fluidigmc1 <- fluidigmc1_raw
 ```
 :::
+
 :::
 
 Now we will subsample each dataset to only have 500 cells. This is to speed up subsequent analyses. Often when we are setting up our analysis, we work with a subset of the data to make iteration across analysis decisions faster, and once we have finalized how we want to do the analysis, we work with the full dataset.
@@ -127,201 +132,138 @@ Now we will subsample each dataset to only have 500 cells. This is to speed up s
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = TRUE, prepare_seurat2, filename = "R"}
-celseq[["tech"]] <- "celseq"
-celseq2[["tech"]] <- "celseq2"
-fluidigmc1[["tech"]] <- "fluidigmc1"
-smartseq2[["tech"]] <- "smartseq2"
-Idents(celseq) <- "tech"
-Idents(celseq2) <- "tech"
-Idents(fluidigmc1) <- "tech"
-Idents(smartseq2) <- "tech"
-
-# This code sub-samples the data in order to speed up calculations and not use too much memory.
-celseq <- subset(celseq, downsample = 500, seed = 1)
-celseq2 <- subset(celseq2, downsample = 500, seed = 1)
-fluidigmc1 <- subset(fluidigmc1, downsample = 500, seed = 1)
-smartseq2 <- subset(smartseq2, downsample = 500, seed = 1)
+celseq <- celseq[ , sample(colnames(celseq), 500) ]
+celseq2 <- celseq2[ , sample(colnames(celseq2), 500) ]
+fluidigmc1 <- fluidigmc1[ , sample(colnames(fluidigmc1), 500) ]
+smartseq2 <- smartseq2[ , sample(colnames(smartseq2), 500) ]
 ```
 :::
+
 :::
 
-## Cluster pancreatic datasets without batch correction
-
-We will first merge all the cells from the four different experiments together, and cluster all the pancreatic islet datasets to see whether there is a batch effect.
+Now we will subset each dataset to only retain the common genes across all four datasets.
 
 ::: {.callout-question .icon .callout-note}
-Merge the datasets into a single Seurat object.
+
+- Using `Reduce`, find the common genes across all four datasets.
+- Subset each dataset to only retain these common genes.
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
-```{r eval = TRUE, no_batch_correction, filename = "R"}
-# Merge Seurat objects. Original sample identities are stored in gcdata[["tech"]].
-# Cell names will now have the format tech_cellID (smartseq2_cell1...)
-add.cell.ids <- c("celseq", "celseq2", "fluidigmc1", "smartseq2")
-gcdata <- merge(x = celseq, y = list(celseq2, fluidigmc1, smartseq2), add.cell.ids = add.cell.ids, merge.data = FALSE)
+```{r eval = TRUE, filename = "R"}
+common_genes <- Reduce(intersect, list(
+    rownames(celseq),
+    rownames(celseq2),
+    rownames(fluidigmc1),
+    rownames(smartseq2)
+))
 
-# Examine gcdata. Notice that there are now 4 counts layers, one layer for each technology.
-gcdata
-VlnPlot(gcdata, "nFeature_RNA", group.by = "tech")
+celseq <- celseq[common_genes, ]
+celseq2 <- celseq2[common_genes, ]
+fluidigmc1 <- fluidigmc1[common_genes, ]
+smartseq2 <- smartseq2[common_genes, ]
 ```
 :::
+
 :::
 
-After merging, we normalize the data with `LogNormalize` method, and identify the 2000 most variable genes for each dataset, using the `vst` approach. Then we scale the data using `ScaleData`.
+## Individual processing 
+
+Like what we have done in previous labs, we will now normalize, identify variable genes, and perform PCA embedding. 
+
+```{r eval = TRUE, filename = "R"}
+process_batch <- function(sce) {
+    clusters <- scran::quickCluster(sce)
+    sce <- scran::computeSumFactors(sce, clusters = clusters)
+    sce <- scuttle::logNormCounts(sce)
+    dec <- scran::modelGeneVar(sce)
+    hvgs <- scran::getTopHVGs(dec, n = 2000)
+    rowData(sce)$highly_variable <- rownames(sce) %in% hvgs
+    sce <- scater::runPCA(sce, subset_row = hvgs, ncomponents = 50)
+    return(sce)
+}
+celseq <- process_batch(celseq)
+celseq2 <- process_batch(celseq2)
+fluidigmc1 <- process_batch(fluidigmc1)
+smartseq2 <- process_batch(smartseq2)
+```
+
+## Batch correction with MNN
+
+We will now use MNN to see to what extent it can remove potential batch effects. The integration workflow for SingleCellExperiment objects requires the identification of shared variable genes.
+
+Why would we need such a requirement?
 
 ::: {.callout-question .icon .callout-note}
-What is the difference between `SelectIntegrationFeatures` and `FindVariableFeatures` in Seurat? Take a look at the documentation for both functions.
 
-Run `NormalizeData`, `FindVariableFeatures`, and `ScaleData` on the merged dataset.
-
-::: {.callout-answer .icon .callout-note collapse="true"}
-```{r eval = TRUE, no_batch_correction2, filename = "R"}
-gcdata <- NormalizeData(gcdata, normalization.method = "LogNormalize", scale.factor = 10000)
-gcdata <- FindVariableFeatures(gcdata, nfeatures = 2000, verbose = TRUE, selection.method = "vst")
-gcdata <- ScaleData(gcdata, features = VariableFeatures(gcdata))
-```
-:::
-:::
-
-Now that data is merged, normalized, and scaled, we will perform principal component analysis (PCA) and visualize the data.
-
-::: {.callout-question .icon .callout-note}
-Do PCA on data including only the variable genes.
-
-::: {.callout-answer .icon .callout-note collapse="true"}
-```{r eval = TRUE, no_batch_correction3, filename = "R"}
-gcdata <- RunPCA(gcdata, features = VariableFeatures(gcdata), npcs = 40, ndims.print = 1:5, nfeatures.print = 5)
-```
-:::
-
-Color the PCA biplot by the scRNA-seq technology.
-
-::: {.callout-answer .icon .callout-note collapse="true"}
-```{r eval = TRUE, no_batch_correction4, filename = "R"}
-DimPlot(gcdata, reduction = "pca", dims = c(1, 2), group.by = "tech")
-```
-:::
-:::
-
-Now we will cluster the cells and visualize the clusters in reduced dimensional space.
-
-::: {.callout-question .icon .callout-note}
--   Find the k=20 nearest neighbors for each cell in the PCA space, using the first 20 principal components.
--   Cluster the cells.
--   Perform UMAP embedding and visualize clustering results in 2D.
-
-::: {.callout-answer .icon .callout-note collapse="true"}
-```{r eval = TRUE, no_batch_correction5, filename = "R"}
-# Cluster the cells using the first twenty principal components.
-gcdata <- FindNeighbors(gcdata, reduction = "pca", dims = 1:20, k.param = 20)
-gcdata <- FindClusters(gcdata, resolution = 0.8, algorithm = 1, random.seed = 100)
-
-# Create a UMAP visualization. 
-gcdata <- RunUMAP(gcdata, dims = 1:20, reduction = "pca", n.neighbors = 15, min.dist = 0.5, spread = 1, metric = "euclidean", seed.use = 1)  
-
-# Visualize the Leiden clustering and the batches on the UMAP. 
-# Remember, the clustering is stored in @meta.data in column seurat_clusters and the technology is
-# stored in the column tech. Remember you can also use DimPlot
-DimPlot(gcdata, reduction = "umap", group.by = "seurat_clusters")
-DimPlot(gcdata, reduction = "umap", group.by = "tech")
-```
-:::
-
-Are you surprised by the results? Compare to your expectations from the PC biplot of PC1 vs PC2.
-
-What explains these results?
-:::
-
-We can assess the quality of the clustering by calculating the adjusted rand index (ARI) between the technology and the cluster labels. This goes between 0 (completely dissimilar clustering) to 1 (identical clustering). The adjustment corrects for chance grouping between cluster elements.
-
-```{r eval = TRUE, no_batch_correction6, filename = "R"}
-library(fossil)
-ari <- dplyr::select(gcdata[[]], tech, seurat_clusters)
-ari$tech <- plyr::mapvalues(ari$tech, from = c("celseq", "celseq2", "fluidigmc1", "smartseq2"), to = c(0, 1, 2, 3))
-adj.rand.index(as.numeric(ari$tech), as.numeric(ari$seurat_clusters))
-```
-
-## Batch correction: canonical correlation analysis (CCA)+ mutual nearest neighbors (MNN)
-
-We will now use Seurat to see to what extent it can remove potential batch effects.
-
-The first piece of code will identify variable genes that are highly variable in at least 2/4 datasets. We will use these variable genes in our batch correction.
-
-Why would we implement such a requirement?
-
-::: {.callout-question .icon .callout-note}
-The integration workflow in Seurat requires the identification of variable genes that are variable across most samples. Use the `IntegrateLayers` function, with the CCAIntegration method, to identify anchors on the 4 pancreatic islet datasets, commonly shared variable genes across samples, and integrate samples.
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = TRUE, batchcorrect_Seurat, filename = "R"}
-gcdata <- IntegrateLayers(object = gcdata, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
+shared_hvgs <- Reduce(intersect, list(
+    rownames(celseq)[rowData(celseq)$highly_variable],
+    rownames(celseq2)[rowData(celseq2)$highly_variable],
+    rownames(fluidigmc1)[rowData(fluidigmc1)$highly_variable],
+    rownames(smartseq2)[rowData(smartseq2)$highly_variable]
+))
+
+length(shared_hvgs)
 ```
 :::
+
 :::
 
-Now that the integration anchors have been used to integrate multiple datasets, we will perform the same clustering analysis as before.
+Now that the shared set of highly variable genes has been identified, we can perform MNN batch correction.
 
 ::: {.callout-question .icon .callout-note}
--   Perform analysis in the new integrated.cca dimensional reduction space.
--   Cluster the cells.
--   Perform UMAP embedding and visualize clustering results in 2D.
+
+-   Use the `fastMNN` function to perform MNN batch correction across the four datasets.
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = TRUE, batchcorrect_Seurat2, filename = "R"}
-# Re-join the four layers after integration.
-gcdata[["RNA"]] <- JoinLayers(gcdata[["RNA"]])
+library(batchelor)
 
-# Clustering
-gcdata <- FindNeighbors(gcdata, reduction = "integrated.cca", dims = 1:20, k.param = 20)
-gcdata <- FindClusters(gcdata, resolution = 0.8, algorithm = 1, random.seed = 100)
+merged_mnn <- fastMNN(
+    celseq,
+    celseq2,
+    fluidigmc1,
+    smartseq2,
+    batch = c(celseq$tech, celseq2$tech, fluidigmc1$tech, smartseq2$tech),
+    subset.row = shared_hvgs,
+    d = 50,
+    correct.all = TRUE
+)
 
-# UMAP
-gcdata <- RunUMAP(gcdata, dims = 1:30, reduction = "integrated.cca", n.neighbors = 15, min.dist = 0.5, spread = 1, metric = "euclidean", seed.use = 1)
+merged_mnn
 
-# Visualize the Louvain clustering and the batches on the UMAP. 
-p1 <- DimPlot(gcdata, reduction = "umap", group.by = "seurat_clusters")
-p2 <- DimPlot(gcdata, reduction = "umap", group.by = "tech")
-p1 + p2
-
-# Individually Visualize each technology dataset.
-DimPlot(gcdata, reduction = "umap", split.by = "tech")
+assay(merged_mnn, "reconstructed")[1:5, 1:5]
+dim(assay(merged_mnn, "reconstructed"))
+range(assay(merged_mnn, "reconstructed"))
+mean(assay(merged_mnn, "reconstructed"))
 ```
 :::
-:::
 
-Let's look again to see how the adjusted rand index changed compared to using no batch correction.
-
-```{r eval = TRUE, batchcorrect_Seurat3, filename = "R"}
-ari <- dplyr::select(gcdata[[]], tech, seurat_clusters)
-ari$tech <- plyr::mapvalues(ari$tech, from = c("celseq", "celseq2", "fluidigmc1", "smartseq2"), to = c(0, 1, 2, 3))
-adj.rand.index(as.numeric(ari$tech), as.numeric(ari$seurat_clusters))
-```
-
-### Differential gene expression and visualization
-
-We can also identify conserved marker genes across the batches. Differential gene expression is done across each batch, and the p-values are combined. (requires `metap` package installation). Note that we use the original expression data in all visualization and DE tests. We should never use values from the integrated data in DE tests, as they violate assumptions of independence among samples that are required for DE tests!
-
-```{r eval = TRUE, batchcorrect_Seurat3b, filename = "R"}
-markers <- FindConservedMarkers(gcdata, ident.1 = 0, grouping.var = "tech", assay = "RNA", print.bar = TRUE)
-head(markers)
-```
-
-::: {.callout-question .icon .callout-note}
-Visualize the expression of the first 5 marker genes on UMAP across the different batches using `DoHeatmap`.
+- Add back the raw counts from each dataset to the merged object for downstream analysis.
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
+```{r eval = TRUE, batchcorrect_Seurat3, filename = "R"}
+assay(merged_mnn, "counts") <- cbind(
+    assay(celseq, "counts"),
+    assay(celseq2, "counts"),
+    assay(fluidigmc1, "counts"),
+    assay(smartseq2, "counts")
+)
+```
+:::
+
+
+:::
+
+Let's look at how well the batches have mixed after MNN correction.
+
 ```{r eval = TRUE, batchcorrect_Seurat4, filename = "R"}
-gcdata <- ScaleData(gcdata, features = rownames(gcdata), do.center = T, do.scale = F)
-DoHeatmap(gcdata, features = rownames(markers)[1:5], group.by = "tech", disp.max = 3)
+library(scater)
+merged_mnn <- scater::runUMAP(merged_mnn, dimred = "corrected", n_neighbors = 15, min_dist = 0.5)
+plotUMAP(merged_mnn, colour_by = "batch")
 ```
-:::
-
-Check the expression of some known marker genes for pancreatic cells (see the [Human pancreas cell atlas](https://www.cell.com/cell-systems/pdfExtended/S2405-4712(16)30292-7)).
-
-```{r eval = TRUE, batchcorrect_Seurat5, filename = "R"}
-genes <- c("GCG", "INS", "SST", "PPY", "PRSS1", "KRT19", "PECAM1", "COL1A1")
-FeaturePlot(gcdata, genes, ncol = 4)
-```
-:::
 
 ## Batch correction: integrative non-negative matrix factorization (NMF)
 
@@ -329,45 +271,43 @@ Here we use integrative non-negative matrix factorization (NMF/LIGER) to see to 
 
 The important parameters in the batch correction are the number of factors (k), the penalty parameter (lambda), and the clustering resolution. The number of factors sets the number of factors (consisting of shared and dataset-specific factors) used in factorizing the matrix. The penalty parameter sets the balance between factors shared across the batches and factors specific to the individual batches. The default setting of lambda=5.0 is usually used by the Macosko lab. Resolution=1.0 is used in the Louvain clustering of the shared neighbor factors that have been quantile normalized.
 
-```{r eval = TRUE, batchcorrect_liger, filename = "R"}
-ob.list <- list("celseq" = celseq, "celseq2" = celseq2, "fluidigmc1" = fluidigmc1, "smartseq2" = smartseq2)
+```{r eval = FALSE, batchcorrect_liger, filename = "R"}
+ob.list <- list("celseq" = celseq_raw, "celseq2" = celseq2_raw, "fluidigmc1" = fluidigmc1_raw, "smartseq2" = smartseq2_raw)
 
 # Create a LIGER object with raw counts data from each batch.
 library(rliger)
-data.liger <- createLiger(sapply(ob.list, function(data) LayerData(data[['RNA']], 'counts')[, colnames(data)]))
+data.liger <- createLiger(lapply(ob.list, function(x) as.matrix(assay(x, "counts"))))
 
 # Normalize gene expression for each batch.
 data.liger <- rliger::normalize(data.liger)
 
 # Find variable genes for LIGER analysis. Identify variable genes that are variable across most samples.
-var.genes <- SelectIntegrationFeatures(ob.list, nfeatures = 2000, verbose = TRUE, fvf.nfeatures = 2000, selection.method = "vst")
-data.liger@varFeatures <- var.genes
-print(length(varFeatures(data.liger)))
+data.liger <- selectGenes(data.liger)
 ```
 
 ::: {.callout-question .icon .callout-note}
+
 Scale the gene expression across the datasets.
-
-Why does LIGER not center the data?
-
-*Hint:* think about the use of non-negative matrix factorization and the constraints that this imposes.
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = FALSE, batchcorrect_liger2, filename = "R"}
 data.liger <- scaleNotCenter(data.liger)
 ```
 :::
+
 :::
 
 Next, we will run the integrative non-negative matrix factorization.
 
 ::: {.callout-question .icon .callout-note}
+
 Use the `runIntegration` function to perform the integrative non-negative matrix factorization.
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = FALSE, batchcorrect_liger3, filename = "R"}
 data.liger <- runIntegration(data.liger, k = 30)
 ```
+
 :::
 
 What do matrices H, V, and W represent, and what are their dimensions?
@@ -377,11 +317,13 @@ dim(getMatrix(data.liger, "H")$celseq)
 dim(getMatrix(data.liger, "V")$celseq)
 dim(getMatrix(data.liger, "W"))
 ```
+
 :::
 
 Next, do normalization and clustering of cells in shared nearest factor space.
 
 ::: {.callout-question .icon .callout-note}
+
 Do quantile normalization, cluster quantile normalized data
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
@@ -391,65 +333,80 @@ data.liger <- runCluster(data.liger)
 ```
 :::
 
-What are the dimensions of H.norm. What does this represent?
+What are the dimensions of `H.norm`. What does this represent?
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = FALSE, batchcorrect_liger6, filename = "R"}
 dim(getMatrix(data.liger, "H.norm"))
 ```
 :::
+
 :::
 
 Let's see what the liger data looks like mapped onto a UMAP visualization.
 
 ::: {.callout-question .icon .callout-note}
+
 Run UMAP on the quantile normalized data and visualize the clusters.
 
 ::: {.callout-answer .icon .callout-note collapse="true"}
 ```{r eval = FALSE, batchcorrect_liger6b, filename = "R"}
-data.liger <- runUMAP(data.liger, n_neighbors = 15, min_dist = 0.5)
-p <- plotByDatasetAndCluster(data.liger) 
-p
+merged_liger <- SingleCellExperiment(
+    colData = cellMeta(data.liger),
+    assay = list(), 
+    reducedDims = list(liger = getMatrix(data.liger, "H.norm"))
+)
 
-clusterUmapList <- plotClusterDimRed(data.liger, splitBy = "dataset", title = names(data.liger))
-plot_grid(plotlist = c(clusterUmapList), align = "hv")
+merged_liger <- scater::runUMAP(merged_liger, dimred = 'liger', n_neighbors = 15, min_dist = 0.5)
+plotUMAP(merged_liger, colour_by = "dataset")
+
 ```
 :::
+
 :::
 
-Finally, let's look at the adjusted rand index between the clusters and technology, and also the genes that load the factors used in data integration.
+## Clustering and differential gene expression
 
-```{r eval = FALSE, batchcorrect_liger7}
-# Let's look to see how the adjusted rand index changed compared to using no batch correction.
-tech <- cellMeta(data.liger)$dataset
-clusters <- cellMeta(data.liger)$leiden_cluster
-ari <- data.frame("tech" = tech, "clusters" = clusters)
-ari$tech <- plyr::mapvalues(ari$tech, from = c("celseq", "celseq2", "fluidigmc1", "smartseq2"), to = c(0, 1, 2, 3))
-adj.rand.index(as.numeric(ari$tech), as.numeric(ari$clusters))
+Clustering can now be performed over the integrated data (using `merged_mnn` here). Here we use the Louvain clustering algorithm. 
 
-# Identify shared and batch-specific marker genes from liger factorization.
-# Use the getFactorMarkers function and choose 2 datasets.
-# Then plot some genes of interest using plotGene functions.
-markers <- getFactorMarkers(data.liger, dataset1 = "celseq2", dataset2 = "smartseq2")
-plotGeneDimRed(data.liger, features = "INS")
+Then, differential gene expression is done across each batch, and the p-values are combined. (requires `metap` package installation). Note that we use the original expression data in all visualization and DE tests. We should never use values from the integrated data in DE tests, as they violate assumptions of independence among samples that are required for DE tests!
 
-# Look at factor loadings in factor 9, celseq2 vs smartseq2.
-plotGeneLoadings(data.liger, markerTable = markers, useFactor = 9)
+::: {.callout-question .icon .callout-note}
+
+- Perform clustering on the MNN integrated data.
+
+::: {.callout-answer .icon .callout-note collapse="true"}
+```{r eval = TRUE, filename = "R"}
+set.seed(42)
+ig <- scran::buildSNNGraph(merged_mnn, use.dimred = "corrected")
+clusters <- igraph::cluster_louvain(ig)$membership
+merged_mnn$cluster <- factor(clusters)
+
+table(merged_mnn$cluster, merged_mnn$batch)
 ```
+:::
 
-## Additional exploration
+- Aggregate cells across batches and clusters to prepare pseudobulk data.
 
-### Regressing out unwanted covariates
+::: {.callout-answer .icon .callout-note collapse="true"}
+```{r eval = TRUE, filename = "R"}
+merged_mnn_sce <- scuttle::aggregateAcrossCells(merged_mnn, use.assay.type = "counts", ids = paste0(merged_mnn$batch, "_", merged_mnn$cluster))
+merged_mnn_se <- as(merged_mnn_sce, "SummarizedExperiment")
+rownames(merged_mnn_se) <- rownames(merged_mnn)
+```
+:::
 
-Learn how to regress out different technical covariates (number of UMIs, number of genes, percent mitochondrial reads) by studying [Seurat's PBMC tutorial](https://satijalab.org/seurat/pbmc3k_tutorial.html) and the `ScaleData()` function.
+- Perform differential gene expression analysis across clusters.
 
-### kBET
+::: {.callout-answer .icon .callout-note collapse="true"}
+```{r eval = TRUE, filename = "R"}
+library(DESeq2)
+dds <- DESeqDataSet(merged_mnn_se, design = ~ batch + cluster)
+dds <- DESeq(dds)
+results(dds)
+```
+:::
 
-Within your RStudio session, install [k-nearest neighbour batch effect test](https://github.com/theislab/kBET) and learn how to use its functionality to quantify batch effects in the pancreatic data.
-
-## Acknowledgements
-
-This document builds off a tutorial from the [Seurat website](https://www.dropbox.com/s/aji4ielg8gc70vj/multiple_pancreas_workflow.R?dl=1) and a tutorial from the [LIGER website](https://welch-lab.github.io/liger/articles/Integrating_multi_scRNA_data.html).
 
 ## Session info
 
